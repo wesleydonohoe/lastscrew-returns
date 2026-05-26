@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hackathon Agent Dashboard</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #0b0d12;
+        --panel: #141824;
+        --border: #2a3144;
+        --text: #e8ecf5;
+        --muted: #9aa6bf;
+        --accent: #6ee7a8;
+        --accent-dim: #1f3d2f;
+        --danger: #f87171;
+        font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: radial-gradient(circle at top, #172033, var(--bg));
+        color: var(--text);
+        min-height: 100vh;
+      }
+
+      .wrap {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 2rem 1.25rem 4rem;
+      }
+
+      header {
+        margin-bottom: 2rem;
+      }
+
+      h1 {
+        margin: 0 0 0.5rem;
+        font-size: 1.75rem;
+      }
+
+      .subtitle {
+        color: var(--muted);
+        margin: 0;
+      }
+
+      .grid {
+        display: grid;
+        gap: 1rem;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      }
+
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 1.25rem;
+      }
+
+      h2 {
+        margin: 0 0 1rem;
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--muted);
+      }
+
+      label {
+        display: block;
+        font-size: 0.85rem;
+        color: var(--muted);
+        margin-bottom: 0.35rem;
+      }
+
+      input,
+      textarea,
+      select {
+        width: 100%;
+        background: #0f131c;
+        border: 1px solid var(--border);
+        color: var(--text);
+        border-radius: 10px;
+        padding: 0.65rem 0.75rem;
+        font: inherit;
+        margin-bottom: 0.85rem;
+      }
+
+      textarea {
+        min-height: 90px;
+        resize: vertical;
+      }
+
+      .row {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+      }
+
+      button {
+        border: none;
+        border-radius: 10px;
+        padding: 0.7rem 1rem;
+        font: inherit;
+        cursor: pointer;
+        background: var(--accent);
+        color: #052e1a;
+        font-weight: 600;
+      }
+
+      button.secondary {
+        background: transparent;
+        color: var(--text);
+        border: 1px solid var(--border);
+      }
+
+      button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      .status {
+        font-size: 0.85rem;
+        color: var(--muted);
+        min-height: 1.25rem;
+      }
+
+      .status.error {
+        color: var(--danger);
+      }
+
+      pre {
+        background: #0f131c;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 0.85rem;
+        overflow: auto;
+        white-space: pre-wrap;
+        word-break: break-word;
+        font-size: 0.85rem;
+        max-height: 320px;
+      }
+
+      .run {
+        border-top: 1px solid var(--border);
+        padding: 0.85rem 0;
+      }
+
+      .run:first-child {
+        border-top: none;
+        padding-top: 0;
+      }
+
+      .run-meta {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        font-size: 0.8rem;
+        color: var(--muted);
+        margin-bottom: 0.35rem;
+      }
+
+      .pill {
+        background: var(--accent-dim);
+        color: var(--accent);
+        padding: 0.1rem 0.45rem;
+        border-radius: 999px;
+      }
+
+      .pill.failed {
+        background: #3f1d1d;
+        color: var(--danger);
+      }
+
+      .tools {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+        margin-bottom: 0.85rem;
+      }
+
+      .tool-chip {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        color: var(--muted);
+      }
+
+      .tool-chip.active {
+        border-color: var(--accent);
+        color: var(--accent);
+        background: var(--accent-dim);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <h1>Hackathon Agent</h1>
+        <p class="subtitle">
+          Cloudflare Worker + Subconscious API. Trigger via button, API, webhook, or cron.
+        </p>
+      </header>
+
+      <div class="grid">
+        <section class="panel">
+          <h2>Agent Logic</h2>
+          <label for="name">Agent name</label>
+          <input id="name" />
+
+          <label for="systemPrompt">System prompt</label>
+          <textarea id="systemPrompt"></textarea>
+
+          <label for="instructions">Default instructions</label>
+          <textarea id="instructions"></textarea>
+
+          <label for="cronInstructions">Cron instructions</label>
+          <textarea id="cronInstructions"></textarea>
+
+          <label for="enabledTools">Enabled tools</label>
+          <div id="tools" class="tools"></div>
+
+          <label>
+            <input type="checkbox" id="enableThinking" />
+            Enable thinking (slower, shows reasoning preamble)
+          </label>
+
+          <div class="row">
+            <button id="saveConfig">Save config</button>
+          </div>
+          <p id="configStatus" class="status"></p>
+        </section>
+
+        <section class="panel">
+          <h2>Run Agent</h2>
+          <label for="runInstructions">Instructions for this run</label>
+          <textarea id="runInstructions" placeholder="Leave blank to use default instructions"></textarea>
+
+          <div class="row">
+            <button id="runAgent">Run now (button trigger)</button>
+            <button id="refreshRuns" class="secondary">Refresh runs</button>
+          </div>
+          <p id="runStatus" class="status"></p>
+
+          <h2 style="margin-top: 1.5rem">Latest output</h2>
+          <pre id="latestOutput">No runs yet.</pre>
+        </section>
+      </div>
+
+      <section class="panel" style="margin-top: 1rem">
+        <h2>Recent runs</h2>
+        <div id="runs"></div>
+      </section>
+    </div>
+
+    <script>
+      const $ = (id) => document.getElementById(id);
+
+      let availableTools = [];
+
+      async function api(path, options = {}) {
+        const res = await fetch(path, {
+          headers: { "Content-Type": "application/json" },
+          ...options,
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          throw new Error(data.error || `Request failed (${res.status})`);
+        }
+        return data;
+      }
+
+      function renderToolChips(config) {
+        const container = $("tools");
+        container.innerHTML = "";
+        for (const tool of availableTools) {
+          const chip = document.createElement("button");
+          chip.type = "button";
+          chip.className = "tool-chip" + (config.enabledTools.includes(tool.name) ? " active" : "");
+          chip.textContent = tool.name;
+          chip.title = tool.description;
+          chip.onclick = () => {
+            const enabled = new Set(config.enabledTools);
+            if (enabled.has(tool.name)) enabled.delete(tool.name);
+            else enabled.add(tool.name);
+            config.enabledTools = [...enabled];
+            renderToolChips(config);
+          };
+          container.appendChild(chip);
+        }
+        container.dataset.config = JSON.stringify(config);
+      }
+
+      async function loadConfig() {
+        const [{ tools }, config] = await Promise.all([
+          api("/api/agent/tools"),
+          api("/api/agent/config"),
+        ]);
+        availableTools = tools;
+        $("name").value = config.name;
+        $("systemPrompt").value = config.systemPrompt;
+        $("instructions").value = config.instructions;
+        $("cronInstructions").value = config.cronInstructions;
+        $("enableThinking").checked = config.enableThinking;
+        renderToolChips(config);
+      }
+
+      async function saveConfig() {
+        const config = JSON.parse($("tools").dataset.config || "{}");
+        const payload = {
+          name: $("name").value,
+          systemPrompt: $("systemPrompt").value,
+          instructions: $("instructions").value,
+          cronInstructions: $("cronInstructions").value,
+          enableThinking: $("enableThinking").checked,
+          enabledTools: config.enabledTools || [],
+        };
+        await api("/api/agent/config", {
+          method: "PUT",
+          body: JSON.stringify(payload),
+        });
+        $("configStatus").textContent = "Config saved.";
+      }
+
+      function renderRuns(runs) {
+        const container = $("runs");
+        if (!runs.length) {
+          container.innerHTML = "<p class='status'>No runs yet.</p>";
+          return;
+        }
+
+        container.innerHTML = runs
+          .map(
+            (run) => `
+          <div class="run">
+            <div class="run-meta">
+              <span class="pill ${run.status === "failed" ? "failed" : ""}">${run.status}</span>
+              <span class="pill">${run.trigger}</span>
+              <span>${new Date(run.createdAt).toLocaleString()}</span>
+            </div>
+            <div>${run.output || run.error || "Running..."}</div>
+          </div>
+        `,
+          )
+          .join("");
+
+        const latest = runs[0];
+        $("latestOutput").textContent =
+          latest.output || latest.error || "Run in progress...";
+      }
+
+      async function refreshRuns() {
+        const { runs } = await api("/api/runs");
+        renderRuns(runs);
+      }
+
+      async function runAgent() {
+        $("runAgent").disabled = true;
+        $("runStatus").textContent = "Running agent...";
+        $("runStatus").className = "status";
+        try {
+          const instructions = $("runInstructions").value.trim();
+          const run = await api("/api/run", {
+            method: "POST",
+            body: JSON.stringify({
+              trigger: "button",
+              ...(instructions ? { instructions } : {}),
+            }),
+          });
+          $("runStatus").textContent = `Run ${run.id} completed.`;
+          await refreshRuns();
+        } catch (error) {
+          $("runStatus").textContent = error.message;
+          $("runStatus").className = "status error";
+        } finally {
+          $("runAgent").disabled = false;
+        }
+      }
+
+      $("saveConfig").onclick = () =>
+        saveConfig().catch((e) => {
+          $("configStatus").textContent = e.message;
+          $("configStatus").className = "status error";
+        });
+
+      $("runAgent").onclick = runAgent;
+      $("refreshRuns").onclick = () =>
+        refreshRuns().catch((e) => {
+          $("runStatus").textContent = e.message;
+          $("runStatus").className = "status error";
+        });
+
+      loadConfig()
+        .then(refreshRuns)
+        .catch((e) => {
+          $("configStatus").textContent = e.message;
+          $("configStatus").className = "status error";
+        });
+    </script>
+  </body>
+</html>

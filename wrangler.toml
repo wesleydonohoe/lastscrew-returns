@@ -1,0 +1,21 @@
+name = "hack-agent-starter"
+main = "src/index.ts"
+compatibility_date = "2025-05-05"
+compatibility_flags = ["nodejs_compat"]
+
+# Run the agent every hour. Change this for your hackathon demo.
+[triggers]
+crons = ["0 * * * *"]
+
+[[kv_namespaces]]
+binding = "AGENT_KV"
+id = "REPLACE_WITH_YOUR_KV_NAMESPACE_ID"
+preview_id = "REPLACE_WITH_YOUR_PREVIEW_KV_NAMESPACE_ID"
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
+
+[vars]
+# Optional: set a shared secret for webhook triggers (override in .dev.vars locally)
+# WEBHOOK_SECRET = "change-me"
