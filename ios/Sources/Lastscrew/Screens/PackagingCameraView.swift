@@ -5,8 +5,6 @@ struct PackagingCameraView: View {
     @EnvironmentObject var router: AppRouter
     let item: ItemDetails
     let offer: HostOffer
-    /// Optional retake tips surfaced from the previous QA verdict.
-    var retakeTips: [String] = []
 
     @StateObject private var camera = CameraController()
     @StateObject private var vm = PackagingViewModel()
@@ -14,6 +12,10 @@ struct PackagingCameraView: View {
     @State private var fallbackImage: UIImage?
     @State private var isCapturing = false
     @State private var showCoach = true
+
+    /// Tips are passed in via AppRouter so popping back to this view (instead
+    /// of pushing a fresh one) keeps the camera session alive across retakes.
+    private var retakeTips: [String] { router.retakeTips }
     @State private var spinAngle: Double = 0
     @State private var visionAgentStatus: String = "preparing…"
 
@@ -230,6 +232,8 @@ struct PackagingCameraView: View {
         defer { isCapturing = false }
         do {
             let img = try await camera.capture()
+            // A new capture invalidates the previous retake tips.
+            router.retakeTips = []
             // Run the phase animation AND the verify call in parallel, and
             // wait for BOTH before navigating. This guarantees the user sees
             // the full agent stream even when the mock returns instantly.
