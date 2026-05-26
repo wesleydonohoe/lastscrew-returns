@@ -1,6 +1,7 @@
 import SwiftUI
 
 enum AppRoute: Hashable {
+    case manageItem(ItemDetails)
     case returnChooser(ItemDetails)
     case offerReveal(ItemDetails)
     case acceptHost(ItemDetails, HostOffer)

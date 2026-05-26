@@ -1,10 +1,11 @@
 {
-  "name": "hack-cloudflare-workers-starter",
+  "name": "lastscrew-worker",
   "version": "0.1.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "wrangler dev",
+    "dev": "wrangler dev --ip 0.0.0.0 --port 8787",
+    "dev:local": "wrangler dev",
     "deploy": "wrangler deploy",
     "types": "wrangler types",
     "check": "tsc --noEmit"

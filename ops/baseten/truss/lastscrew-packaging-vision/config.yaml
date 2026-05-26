@@ -1,0 +1,30 @@
+# lastscrew-packaging-vision — a real vision-language model that LOOKS at the
+# packaging photo and returns a structured QA verdict.
+#
+# This is a Python-based Truss (unlike the config-only `lastscrew-qa-reasoner`)
+# because Baseten's trt_llm config-only path is text-only. For multimodal we
+# need our own predict() function — see model/model.py.
+#
+# Deploy:
+#   uv tool install truss
+#   truss login --browser
+#   cd ops/baseten/truss/lastscrew-packaging-vision
+#   truss push
+#
+# After push, copy the model id from the logs URL and set in .dev.vars:
+#   BASETEN_MODEL_ID=<id>
+#   BASETEN_ENDPOINT=predict        # tells the Worker to use /production/predict (not the openai-compat URL)
+
+model_name: lastscrew-packaging-vision
+python_version: py311
+requirements:
+  - torch==2.4.0
+  - transformers==4.45.2
+  - accelerate==0.34.2
+  - pillow==10.4.0
+  - safetensors==0.4.5
+resources:
+  accelerator: A10G   # 24 GB VRAM is enough for Qwen2-VL-7B in bf16
+  use_gpu: true
+runtime:
+  predict_concurrency: 1

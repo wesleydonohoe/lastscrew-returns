@@ -28,6 +28,9 @@ export interface Env {
   SUBCONSCIOUS_API_KEY: string;
   BASETEN_API_KEY?: string;
   BASETEN_MODEL_ID?: string;
+  BASETEN_MODEL_NAME?: string;
+  /** "predict" (Python Truss) | "openai" (trt_llm config-only). Default predict. */
+  BASETEN_ENDPOINT?: string;
   WEBHOOK_SECRET?: string;
   AGENT_KV: KVNamespace;
   ASSETS: Fetcher;

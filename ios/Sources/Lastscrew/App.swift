@@ -19,9 +19,11 @@ struct RootView: View {
 
     var body: some View {
         NavigationStack(path: $router.path) {
-            ManageItemView()
+            HomeView()
                 .navigationDestination(for: AppRoute.self) { route in
                     switch route {
+                    case .manageItem(let item):
+                        ManageItemView(item: item)
                     case .returnChooser(let item):
                         ReturnChooserView(item: item)
                     case .offerReveal(let item):

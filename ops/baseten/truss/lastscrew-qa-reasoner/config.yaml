@@ -1,0 +1,32 @@
+# lastscrew-qa-reasoner — packaging QA reasoner deployed via Baseten
+#
+# This is a "build your first model" config-only Truss
+# (https://docs.baseten.co/development/model/build-your-first-model).
+# No Python code — Baseten's TensorRT-LLM builder compiles the HuggingFace
+# checkpoint into an OpenAI-compatible chat endpoint.
+#
+# Push with:
+#   uv tool install truss
+#   truss login --browser
+#   cd ops/baseten/truss/lastscrew-qa-reasoner
+#   truss push
+#
+# After push, copy the model id from the logs URL into .dev.vars:
+#   BASETEN_MODEL_ID=<id>
+#   BASETEN_MODEL_NAME=lastscrew-qa-reasoner
+
+model_name: lastscrew-qa-reasoner
+resources:
+  accelerator: L4
+model_metadata:
+  tags:
+    - openai-compatible
+trt_llm:
+  build:
+    base_model: decoder
+    checkpoint_repository:
+      source: HF
+      repo: Qwen/Qwen2.5-3B-Instruct
+    max_seq_len: 8192
+    quantization_type: fp8
+    tensor_parallel_count: 1

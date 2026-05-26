@@ -3,8 +3,15 @@ SUBCONSCIOUS_API_KEY=sky_your_key_here
 
 # Baseten — hosts the packaging-QA vision model.
 # https://docs.baseten.co/overview  /  model deployment id from the Baseten dashboard.
+# Push the Truss in ops/baseten/truss/lastscrew-packaging-vision then paste the id.
 BASETEN_API_KEY=
 BASETEN_MODEL_ID=
+# Optional — must match `model_name` in the Truss config.yaml.
+BASETEN_MODEL_NAME=lastscrew-packaging-vision
+# Which Baseten endpoint shape to use:
+#   predict = Python Truss /production/predict  (our vision model)
+#   openai  = trt_llm config-only /environments/production/sync/v1/chat/completions
+BASETEN_ENDPOINT=predict
 
 # Optional: require this header on POST /api/webhook
 # WEBHOOK_SECRET=your-webhook-secret

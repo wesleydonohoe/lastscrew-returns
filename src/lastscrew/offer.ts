@@ -10,6 +10,12 @@
 import { runAgentLoop } from "../agent/loop";
 import { TOOL_REGISTRY, getMockItem } from "../agent/tools";
 
+export interface ToolCallTrace {
+  name: string;
+  arguments: unknown;
+  result: unknown;
+}
+
 export interface HostOffer {
   orderId: string;
   zip: string;
@@ -22,20 +28,28 @@ export interface HostOffer {
   expectedDaysToClaim: number;
   reasoning: string;
   source: "subconscious" | "fallback";
+  /** What the agent actually looked at — surfaced so the iOS app can audit it. */
+  toolCalls: ToolCallTrace[];
 }
 
 const OFFER_INSTRUCTIONS = (orderId: string, zip: string) => `You are pricing a "Last Screw" host offer for Wayfair.
 
-The customer wants to return order ${orderId}. Instead of disassembling, they will keep the item assembled, repackage it, and act as a micro-warehouse until a local buyer claims it at a discount.
+The customer wants to return order ${orderId}. They are going to dismantle the item anyway — that's the standard return path. The Last Screw deal pays them for that labor: they dismantle, repackage to ship-ready quality, hold it in their home as a local distribution node, and ship it to a nearby buyer when one claims it at an assembled-deal discount.
 
-Wayfair saves money because (a) we skip the return-shipping leg, (b) we skip warehouse intake/QA, (c) the buyer pays for a like-new assembled item. Your job is to size the host's incentive so that:
-- Total host earnings are clearly less than Wayfair's logistics savings.
+Wayfair saves money because (a) we skip the return-shipping leg back to the FC, (b) we skip the warehouse intake + QA + labor of breaking the item down again, (c) the resold unit ships locally for less. Your job is to size the host's incentive so that:
+- Total host earnings are clearly less than Wayfair's logistics + labor savings.
 - The signing bonus alone is meaningful so they say yes immediately.
-- Daily storage rewards encourage them to keep the item safe, but capped.
-- The resale bounty rewards them when a buyer claims the item.
+- The dismantle+pack labor bonus rewards them for doing the warehouse's job.
+- Storage rent compensates them for floor space while it sits.
+- The resale bounty rewards them when a local buyer claims it.
+
+YOU MUST examine these specific item characteristics and tailor the offer:
+- Heavier or harder-to-package items deserve a larger storage and signing bonus (more friction).
+- Higher-retail items deserve a larger resale bounty (more upside for Wayfair on resale).
+- Longer expected-days-to-claim means a larger maxStorageDays.
 
 Steps to take this turn:
-1. Call get_item_details for orderId="${orderId}".
+1. Call get_item_details for orderId="${orderId}". Read its retailPriceUsd, weightLbs, packagingDifficulty, assemblyTimeMinutes — these drive your numbers.
 2. Call get_local_demand for the item's sku and zip="${zip}".
 3. Call get_warehouse_pressure for zip="${zip}" with the item's weightLbs.
 4. Then emit a SINGLE final_answer whose content is STRICT JSON only — no prose, no backticks — with this exact shape:
@@ -47,7 +61,7 @@ Steps to take this turn:
   "photoBonusUsd": <int>,
   "projectedMaxEarningsUsd": <int>,
   "expectedDaysToClaim": <int>,
-  "reasoning": "<one short paragraph the host will read>"
+  "reasoning": "<one short paragraph that explicitly references the item's weight, retail price, and packaging difficulty so the host understands why their offer differs from someone else's>"
 }
 
 Constraints:
@@ -71,7 +85,7 @@ export async function computeHostOffer(args: {
       const result = await runAgentLoop({
         apiKey: args.apiKey,
         systemPrompt:
-          "You are LastScrew Pricing — a careful pricing agent. Always use tools to gather facts before deciding numbers.",
+          "You are LastScrew Pricing — a careful pricing agent. Always use tools to gather facts before deciding numbers. The host offer MUST vary meaningfully by item characteristics.",
         instructions: OFFER_INSTRUCTIONS(orderId, zip),
         enabledTools: [
           "get_item_details",
@@ -84,12 +98,18 @@ export async function computeHostOffer(args: {
         enableThinking: false,
       });
       const parsed = tryParseOffer(result.answer);
+      const toolCalls: ToolCallTrace[] = result.toolCalls.map((tc) => ({
+        name: tc.name,
+        arguments: safeParse(tc.arguments),
+        result: safeParse(tc.result),
+      }));
       if (parsed) {
         return {
           orderId,
           zip,
           ...parsed,
           source: "subconscious",
+          toolCalls,
         };
       }
     } catch {
@@ -100,9 +120,17 @@ export async function computeHostOffer(args: {
   return fallbackOffer(orderId, zip);
 }
 
+function safeParse(s: string): unknown {
+  try {
+    return JSON.parse(s);
+  } catch {
+    return s;
+  }
+}
+
 function tryParseOffer(
   raw: string,
-): Omit<HostOffer, "orderId" | "zip" | "source"> | null {
+): Omit<HostOffer, "orderId" | "zip" | "source" | "toolCalls"> | null {
   try {
     const start = raw.indexOf("{");
     const end = raw.lastIndexOf("}");
@@ -161,14 +189,19 @@ function fallbackOffer(orderId: string, zip: string): HostOffer {
 
   const saved = pressure.savedIfHostShipsDirect;
   const demandBoost = Math.min(1.4, 0.7 + demand.interestedShoppers * 0.04);
-  const signingBonusUsd = Math.max(25, Math.round(saved * 0.18 * demandBoost));
-  const dailyStorageUsd = Math.max(2, Math.round(saved * 0.012));
+  // Difficulty multiplier so heavier/harder items get a meaningfully bigger offer.
+  const difficultyMult =
+    item?.packagingDifficulty === "hard" ? 1.25 :
+    item?.packagingDifficulty === "easy" ? 0.85 : 1.0;
+  const retailLift = item ? Math.min(1.3, 0.85 + item.retailPriceUsd / 2000) : 1.0;
+  const signingBonusUsd = Math.max(25, Math.round(saved * 0.18 * demandBoost * difficultyMult));
+  const dailyStorageUsd = Math.max(2, Math.round(saved * 0.012 * difficultyMult));
   const maxStorageDays = Math.min(
     21,
     Math.max(7, demand.expectedDaysToClaim + 4),
   );
-  const resaleBountyUsd = Math.max(35, Math.round(saved * 0.25 * demandBoost));
-  const photoBonusUsd = Math.max(8, Math.round(saved * 0.04));
+  const resaleBountyUsd = Math.max(35, Math.round(saved * 0.25 * demandBoost * retailLift));
+  const photoBonusUsd = Math.max(8, Math.round(saved * 0.04 * difficultyMult));
   const projectedMaxEarningsUsd =
     signingBonusUsd +
     dailyStorageUsd * maxStorageDays +
@@ -185,9 +218,12 @@ function fallbackOffer(orderId: string, zip: string): HostOffer {
     photoBonusUsd,
     projectedMaxEarningsUsd,
     expectedDaysToClaim: demand.expectedDaysToClaim,
-    reasoning: `Local demand is healthy (${demand.interestedShoppers} shoppers nearby, expected claim in ${demand.expectedDaysToClaim} days). FC ${pressure.fcUtilizationPct}% utilized, so skipping the return + restock saves Wayfair roughly $${saved}. We're sharing ~${Math.round(
-      (projectedMaxEarningsUsd / saved) * 100,
-    )}% of that with you.`,
+    reasoning: `${item?.name ?? "Item"} (${item?.weightLbs ?? "?"} lb, $${item?.retailPriceUsd ?? "?"} retail, ${item?.packagingDifficulty ?? "?"} to package). ${demand.interestedShoppers} local shoppers, expected claim in ${demand.expectedDaysToClaim} days, FC ${pressure.fcUtilizationPct}% utilized. Wayfair saves ~$${saved} by skipping return + restock; we share ~${Math.round((projectedMaxEarningsUsd / saved) * 100)}% with you.`,
     source: "fallback",
+    toolCalls: [
+      { name: "get_item_details", arguments: { orderId }, result: item },
+      { name: "get_local_demand", arguments: { sku: item?.sku, zip }, result: demand },
+      { name: "get_warehouse_pressure", arguments: { zip, weightLbs: item?.weightLbs }, result: pressure },
+    ],
   };
 }
