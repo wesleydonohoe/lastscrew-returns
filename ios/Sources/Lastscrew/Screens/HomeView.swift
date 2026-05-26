@@ -143,10 +143,8 @@ private struct EligibleRow: View {
                     )
 
                 VStack(alignment: .leading, spacing: 6) {
-                    HStack(spacing: 6) {
-                        statusChip(label: "Delivered", color: Theme.money)
-                        statusChip(label: "ELIGIBLE", color: Theme.molten, glow: true)
-                    }
+                    statusChip(label: "Delivered", color: Theme.money)
+                        .fixedSize(horizontal: true, vertical: false)
                     Text(item.name)
                         .font(.system(size: 15, weight: .semibold))
                         .foregroundStyle(Theme.text)
@@ -154,10 +152,9 @@ private struct EligibleRow: View {
                     Text("By \(item.brand) · \(Int(item.weightLbs)) lb · \(item.assemblyTimeMinutes) min")
                         .font(.caption)
                         .foregroundStyle(Theme.textMuted)
+                        .lineLimit(2)
                 }
                 Spacer(minLength: 0)
-                Image(systemName: "arrow.right")
-                    .foregroundStyle(Theme.textMuted)
             }
 
             // payout band
