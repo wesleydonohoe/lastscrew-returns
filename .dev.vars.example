@@ -1,5 +1,10 @@
 # Copy to .dev.vars and fill in your key from https://www.subconscious.dev/platform
 SUBCONSCIOUS_API_KEY=sky_your_key_here
 
+# Baseten — hosts the packaging-QA vision model.
+# https://docs.baseten.co/overview  /  model deployment id from the Baseten dashboard.
+BASETEN_API_KEY=
+BASETEN_MODEL_ID=
+
 # Optional: require this header on POST /api/webhook
 # WEBHOOK_SECRET=your-webhook-secret

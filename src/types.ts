@@ -26,6 +26,8 @@ export interface AgentRunRecord {
 
 export interface Env {
   SUBCONSCIOUS_API_KEY: string;
+  BASETEN_API_KEY?: string;
+  BASETEN_MODEL_ID?: string;
   WEBHOOK_SECRET?: string;
   AGENT_KV: KVNamespace;
   ASSETS: Fetcher;
@@ -35,15 +37,20 @@ export const CONFIG_KEY = "agent:config";
 export const RUNS_PREFIX = "agent:run:";
 
 export const DEFAULT_AGENT_CONFIG: AgentConfig = {
-  name: "Hackathon Agent",
+  name: "LastScrew Pricing",
   systemPrompt:
-    "You are a helpful AI agent running on Cloudflare Workers. Be concise and actionable.",
+    "You are LastScrew Pricing — a careful pricing agent for Wayfair's micro-warehouse host program. Always use tools to gather facts before deciding numbers.",
   instructions:
-    "Check in on the hackathon project. Summarize what you would do next and one concrete action the team should take.",
+    "Compute a host offer for order WF-ORDER-8821 in ZIP 02116. Follow the get_item_details → get_local_demand → get_warehouse_pressure flow and return strict JSON.",
   enableThinking: false,
-  maxTokens: 1000,
-  temperature: 0.7,
-  enabledTools: ["search_catalog", "log_note", "get_time"],
+  maxTokens: 900,
+  temperature: 0.4,
+  enabledTools: [
+    "get_item_details",
+    "get_local_demand",
+    "get_warehouse_pressure",
+    "log_packaging_check",
+  ],
   cronInstructions:
-    "This is a scheduled check-in. Review the latest notes and suggest the top priority for the team.",
+    "Daily check: estimate how many active hosts are in our network and flag any items past max_storage_days.",
 };
