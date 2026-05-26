@@ -1,0 +1,23 @@
+<svg width="240" height="240" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="ch" cx="0.36" cy="0.30" r="0.95">
+      <stop offset="0" stop-color="#F6F8FB"/><stop offset="0.5" stop-color="#9CA2AC"/><stop offset="1" stop-color="#34383F"/>
+    </radialGradient>
+    <radialGradient id="mo" cx="0.5" cy="0.42" r="0.62">
+      <stop offset="0" stop-color="#FFF3C4"/><stop offset="0.6" stop-color="#FF5A1F"/><stop offset="1" stop-color="#B81E00"/>
+    </radialGradient>
+    <linearGradient id="arc" x1="0" y1="0" x2="240" y2="240">
+      <stop offset="0" stop-color="#FFC24D"/><stop offset="1" stop-color="#FF3D00"/>
+    </linearGradient>
+  </defs>
+  <path d="M120 26 A94 94 0 1 1 41 73" fill="none" stroke="url(#arc)" stroke-width="15" stroke-linecap="round"/>
+  <path d="M120 26 l-26 -16 l4 32 Z" fill="#FFC24D"/>
+  <g transform="rotate(8 120 120)">
+    <circle cx="120" cy="120" r="66" fill="#1A1C20"/>
+    <circle cx="120" cy="120" r="62" fill="url(#ch)"/>
+    <g fill="url(#mo)">
+      <path d="M120 80 L130 92 L130 148 L120 160 L110 148 L110 92 Z"/>
+      <path d="M80 120 L92 110 L148 110 L160 120 L148 130 L92 130 Z"/>
+    </g>
+  </g>
+</svg>

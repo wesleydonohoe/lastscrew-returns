@@ -21,7 +21,9 @@ struct ManageItemView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .principal) {
-                Text("Manage Your Item").font(.headline)
+                Text("Manage Your Item")
+                    .font(.headline)
+                    .foregroundStyle(Theme.text)
             }
         }
         .task { await loadItem() }
@@ -31,7 +33,7 @@ struct ManageItemView: View {
         HStack {
             Text("wayfair.com")
                 .font(.footnote)
-                .foregroundStyle(Theme.muted)
+                .foregroundStyle(Theme.textMuted)
             Spacer()
         }
     }
@@ -45,21 +47,23 @@ struct ManageItemView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 10))
             VStack(alignment: .leading, spacing: 8) {
                 Text("Delivered")
-                    .font(.caption.weight(.semibold))
+                    .font(.caption.weight(.heavy))
                     .padding(.horizontal, 10)
                     .padding(.vertical, 4)
-                    .background(Color(red: 0.85, green: 0.95, blue: 0.86))
-                    .foregroundColor(Color(red: 0.10, green: 0.35, blue: 0.18))
+                    .background(Theme.money.opacity(0.18))
+                    .foregroundColor(Theme.money)
+                    .overlay(Capsule().stroke(Theme.money.opacity(0.5), lineWidth: 1))
                     .clipShape(Capsule())
                 Text(item.name)
                     .font(.system(size: 17, weight: .semibold))
+                    .foregroundStyle(Theme.text)
                     .lineLimit(2)
                 Text("Quantity: 1")
                     .font(.subheadline)
-                    .foregroundStyle(Theme.text.opacity(0.8))
+                    .foregroundStyle(Theme.textMuted)
                 Text("Last Package Delivered: Sun, May 17")
                     .font(.subheadline)
-                    .foregroundStyle(Theme.text.opacity(0.8))
+                    .foregroundStyle(Theme.textMuted)
             }
             Spacer()
         }
@@ -71,22 +75,22 @@ struct ManageItemView: View {
             HStack(spacing: 16) {
                 Image(systemName: icon)
                     .font(.system(size: 22, weight: .regular))
-                    .foregroundStyle(Theme.purple)
+                    .foregroundStyle(Theme.accent)
                     .frame(width: 36)
                 Text(title)
                     .font(.system(size: 17, weight: .semibold))
                     .foregroundStyle(Theme.text)
                 Spacer()
                 Image(systemName: "arrow.right")
-                    .foregroundStyle(Theme.text)
+                    .foregroundStyle(Theme.textMuted)
             }
             .padding(.vertical, 16)
             .padding(.horizontal, 16)
-            .background(Color.white)
+            .background(Theme.surface)
             .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .stroke(Theme.cardStroke, lineWidth: 1)
+                    .stroke(Theme.border, lineWidth: 1)
             )
         }
         .buttonStyle(.plain)
@@ -99,34 +103,34 @@ struct ManageItemView: View {
             VStack(alignment: .leading, spacing: 12) {
                 HStack(spacing: 10) {
                     ZStack {
-                        Circle().fill(Color.white.opacity(0.2))
+                        Circle().fill(Theme.gunmetal.opacity(0.35))
                         Image(systemName: "shippingbox.and.arrow.backward.fill")
-                            .foregroundColor(.white)
+                            .foregroundColor(Theme.chrome)
                     }
                     .frame(width: 36, height: 36)
                     Text("Return or replace my item")
-                        .font(.system(size: 17, weight: .bold))
-                        .foregroundColor(.white)
+                        .font(.system(size: 17, weight: .heavy))
+                        .foregroundColor(Theme.chrome)
                     Spacer()
                     Image(systemName: "chevron.down")
-                        .foregroundColor(.white.opacity(0.9))
+                        .foregroundColor(Theme.chrome.opacity(0.9))
                 }
                 HStack(alignment: .firstTextBaseline, spacing: 6) {
                     Text("NEW")
                         .font(.caption2.weight(.heavy))
                         .padding(.horizontal, 6).padding(.vertical, 2)
-                        .background(Color.white)
-                        .foregroundColor(Theme.purple)
+                        .background(Theme.chrome)
+                        .foregroundColor(Theme.gunmetal)
                         .clipShape(Capsule())
-                    Text("Don't dismantle it — earn from it.")
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundColor(.white.opacity(0.95))
+                    Text("Dismantle it. Get paid for it.")
+                        .font(.subheadline.weight(.heavy))
+                        .foregroundColor(Theme.chrome)
                 }
             }
             .padding(18)
             .background(Theme.earnGradient)
             .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-            .shadow(color: Theme.purple.opacity(0.25), radius: 12, y: 6)
+            .shadow(color: Theme.molten.opacity(0.45), radius: 16, y: 8)
         }
         .buttonStyle(.plain)
     }

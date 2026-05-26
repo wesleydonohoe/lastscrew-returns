@@ -1,0 +1,76 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="field" x1="0" y1="0" x2="0" y2="1024" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#16181C"/><stop offset="1" stop-color="#08080A"/>
+    </linearGradient>
+    <radialGradient id="heat" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#FF4D1C" stop-opacity="0.45"/>
+      <stop offset="0.5" stop-color="#FF4D1C" stop-opacity="0.10"/>
+      <stop offset="1" stop-color="#FF4D1C" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="chrome" cx="0.36" cy="0.30" r="0.95">
+      <stop offset="0" stop-color="#F6F8FB"/><stop offset="0.22" stop-color="#D2D7DE"/>
+      <stop offset="0.5" stop-color="#9CA2AC"/><stop offset="0.74" stop-color="#5C616B"/>
+      <stop offset="1" stop-color="#34383F"/>
+    </radialGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F2F5F8"/><stop offset="0.5" stop-color="#7A7F88"/><stop offset="1" stop-color="#23262B"/>
+    </linearGradient>
+    <radialGradient id="molten" cx="0.5" cy="0.42" r="0.62">
+      <stop offset="0" stop-color="#FFF3C4"/><stop offset="0.35" stop-color="#FFC24D"/>
+      <stop offset="0.7" stop-color="#FF5A1F"/><stop offset="1" stop-color="#B81E00"/>
+    </radialGradient>
+    <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="26"/>
+    </filter>
+    <filter id="soft" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="7"/></filter>
+    <pattern id="brush" width="7" height="1024" patternUnits="userSpaceOnUse">
+      <rect width="7" height="1024" fill="none"/>
+      <line x1="0" y1="0" x2="0" y2="1024" stroke="#FFFFFF" stroke-width="1" opacity="0.025"/>
+    </pattern>
+  </defs>
+
+  <rect width="1024" height="1024" fill="url(#field)"/>
+  <rect width="1024" height="1024" fill="url(#brush)"/>
+  <rect x="62" y="62" width="900" height="900" fill="url(#heat)"/>
+
+  <!-- scratches -->
+  <g stroke="#FFFFFF" stroke-linecap="round" opacity="0.06">
+    <line x1="140" y1="210" x2="430" y2="150" stroke-width="2"/>
+    <line x1="690" y1="860" x2="930" y2="760" stroke-width="2"/>
+    <line x1="120" y1="700" x2="280" y2="640" stroke-width="1.5"/>
+  </g>
+
+  <g transform="translate(512 512) rotate(8) translate(-512 -512)">
+    <circle cx="512" cy="532" r="316" fill="#000" opacity="0.6" filter="url(#soft)"/>
+    <!-- knurled rim -->
+    <circle cx="512" cy="512" r="316" fill="url(#rim)"/>
+    <circle cx="512" cy="512" r="316" fill="none" stroke="#0C0D0F" stroke-width="14"
+            stroke-dasharray="10 12" opacity="0.85"/>
+    <circle cx="512" cy="512" r="300" fill="#1A1C20"/>
+    <!-- chrome face -->
+    <circle cx="512" cy="512" r="292" fill="url(#chrome)"/>
+    <circle cx="512" cy="512" r="256" fill="none" stroke="#2C2F35" stroke-width="5" opacity="0.6"/>
+    <circle cx="512" cy="512" r="256" fill="none" stroke="#FFFFFF" stroke-width="1.5" opacity="0.45"/>
+
+    <!-- molten glow behind the cross -->
+    <g filter="url(#glow)">
+      <path d="M512 292 L552 350 L552 674 L512 732 L472 674 L472 350 Z" fill="#FF5A1F"/>
+      <path d="M292 512 L350 472 L674 472 L732 512 L674 552 L350 552 Z" fill="#FF5A1F"/>
+    </g>
+    <!-- molten Phillips cross -->
+    <g>
+      <path d="M512 300 L558 360 L558 664 L512 724 L466 664 L466 360 Z" fill="url(#molten)"/>
+      <path d="M300 512 L360 466 L664 466 L724 512 L664 558 L360 558 Z" fill="url(#molten)"/>
+      <circle cx="512" cy="512" r="30" fill="#FFE9A8"/>
+    </g>
+    <!-- chrome specular streaks -->
+    <ellipse cx="404" cy="372" rx="138" ry="66" fill="#FFFFFF" opacity="0.5" transform="rotate(-36 404 372)"/>
+    <ellipse cx="636" cy="640" rx="90" ry="30" fill="#FFFFFF" opacity="0.18" transform="rotate(-36 636 640)"/>
+  </g>
+
+  <radialGradient id="vig" cx="0.5" cy="0.5" r="0.72">
+    <stop offset="0.62" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity="0.55"/>
+  </radialGradient>
+  <rect width="1024" height="1024" fill="url(#vig)"/>
+</svg>

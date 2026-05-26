@@ -23,8 +23,14 @@ struct HostDashboardView: View {
                     Text("Done — return to home")
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 14)
+                        .foregroundStyle(Theme.text)
+                        .background(Theme.surface)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                .stroke(Theme.border, lineWidth: 1)
+                        )
+                        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                 }
-                .buttonStyle(.bordered)
             }
             .padding(20)
         }
@@ -47,43 +53,44 @@ struct HostDashboardView: View {
         VStack(alignment: .leading, spacing: 6) {
             Text(item.name)
                 .font(.headline)
+                .foregroundStyle(Theme.text)
             Text("ZIP \(offer.zip) · Expected claim in \(offer.expectedDaysToClaim) days")
                 .font(.subheadline)
-                .foregroundStyle(Theme.muted)
+                .foregroundStyle(Theme.textMuted)
         }
     }
 
     private var earningsTickerCard: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text("Earned so far").font(.subheadline).foregroundStyle(Theme.muted)
+            Text("Earned so far").font(.subheadline).foregroundStyle(Theme.textMuted)
             HStack(alignment: .firstTextBaseline, spacing: 4) {
                 Text("$")
-                    .font(.system(size: 22, weight: .bold, design: .rounded))
-                    .foregroundStyle(Theme.purple)
+                    .font(.system(size: 22, weight: .heavy, design: .monospaced))
+                    .foregroundStyle(Theme.money)
                 Text(String(format: "%.4f", liveEarnings))
-                    .font(.system(size: 36, weight: .bold, design: .rounded))
-                    .foregroundStyle(Theme.purpleDeep)
+                    .font(.system(size: 36, weight: .heavy, design: .monospaced))
+                    .foregroundStyle(Theme.money)
                     .contentTransition(.numericText(value: liveEarnings))
                     .animation(.easeOut(duration: 0.2), value: liveEarnings)
             }
             HStack(spacing: 10) {
                 Label("$\(offer.dailyStorageUsd)/day storage", systemImage: "clock.fill")
-                    .font(.caption).foregroundStyle(Theme.muted)
+                    .font(.caption).foregroundStyle(Theme.textMuted)
                 Label("Bonus \(String(format: "%.2f×", qa.bonusMultiplier))", systemImage: "star.fill")
-                    .font(.caption).foregroundStyle(Theme.muted)
+                    .font(.caption).foregroundStyle(Theme.textMuted)
             }
             Text("Up to $\(offer.projectedMaxEarningsUsd) total")
-                .font(.footnote)
-                .foregroundStyle(Theme.green)
+                .font(Theme.monoFont)
+                .foregroundStyle(Theme.money)
         }
         .cardStyle()
     }
 
     private var statusCard: some View {
         VStack(alignment: .leading, spacing: 10) {
-            statusRow(.green, icon: "shippingbox.fill", title: "Packaged & QA'd", subtitle: "Score \(Int(qa.score * 100))%")
-            statusRow(.orange, icon: "magnifyingglass", title: "Listed for local buyers", subtitle: "ETA \(offer.expectedDaysToClaim) days")
-            statusRow(.gray, icon: "truck.box.fill", title: "Awaiting carrier handoff", subtitle: "We'll notify you when a buyer claims it")
+            statusRow(Theme.money,    icon: "shippingbox.fill", title: "Packaged & QA'd", subtitle: "Score \(Int(qa.score * 100))%")
+            statusRow(Theme.accent,   icon: "magnifyingglass",  title: "Listed for local buyers", subtitle: "ETA \(offer.expectedDaysToClaim) days")
+            statusRow(Theme.chromeDim, icon: "truck.box.fill",  title: "Awaiting carrier handoff", subtitle: "We'll notify you when a buyer claims it")
         }
         .cardStyle()
     }
@@ -95,8 +102,8 @@ struct HostDashboardView: View {
                 Image(systemName: icon).foregroundColor(color)
             }
             VStack(alignment: .leading, spacing: 2) {
-                Text(title).font(.subheadline.weight(.semibold))
-                Text(subtitle).font(.caption).foregroundStyle(Theme.muted)
+                Text(title).font(.subheadline.weight(.semibold)).foregroundStyle(Theme.text)
+                Text(subtitle).font(.caption).foregroundStyle(Theme.textMuted)
             }
             Spacer()
         }
@@ -118,8 +125,12 @@ struct HostDashboardView: View {
             .font(.subheadline.weight(.semibold))
             .frame(maxWidth: .infinity)
             .padding(.vertical, 14)
-            .background(Theme.purple.opacity(0.08))
-            .foregroundColor(Theme.purple)
+            .background(Theme.accent.opacity(0.14))
+            .foregroundColor(Theme.accent)
+            .overlay(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .stroke(Theme.accent.opacity(0.4), lineWidth: 1)
+            )
             .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         }
     }

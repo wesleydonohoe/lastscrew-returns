@@ -5,10 +5,10 @@ struct EarningsBreakdownView: View {
 
     private var components: [(String, Int, Color, String)] {
         [
-            ("Signing bonus", offer.signingBonusUsd, Theme.purple, "Hits your account when you accept."),
-            ("Daily storage × \(offer.maxStorageDays)d", offer.dailyStorageUsd * offer.maxStorageDays, Color(red: 0.55, green: 0.30, blue: 0.85), "Up to $\(offer.dailyStorageUsd)/day while it sits."),
-            ("Resale bounty", offer.resaleBountyUsd, Theme.green, "Paid when a local buyer claims it."),
-            ("Photo verification bonus", offer.photoBonusUsd, Color(red: 0.95, green: 0.6, blue: 0.15), "After packaging QA passes.")
+            ("Signing bonus",                offer.signingBonusUsd,                          Theme.molten,    "Hits your account the moment you accept."),
+            ("Dismantle + pack labor",       offer.photoBonusUsd,                            Theme.amber,     "Paid when our vision model confirms the package is ship-ready."),
+            ("Storage rent × \(offer.maxStorageDays)d", offer.dailyStorageUsd * offer.maxStorageDays, Theme.chromeDim, "Up to $\(offer.dailyStorageUsd)/day while it sits in your home."),
+            ("Resale bounty",                offer.resaleBountyUsd,                          Theme.acid,      "Paid when a local buyer claims the assembled-deal listing.")
         ]
     }
 
@@ -18,19 +18,20 @@ struct EarningsBreakdownView: View {
         VStack(alignment: .leading, spacing: 16) {
             Text("How you earn")
                 .font(.headline)
+                .foregroundStyle(Theme.text)
             stackedBar
             VStack(spacing: 12) {
                 ForEach(components, id: \.0) { (label, amount, color, blurb) in
                     HStack(alignment: .top, spacing: 12) {
                         RoundedRectangle(cornerRadius: 4).fill(color).frame(width: 8, height: 36)
                         VStack(alignment: .leading, spacing: 2) {
-                            Text(label).font(.subheadline.weight(.semibold))
-                            Text(blurb).font(.caption).foregroundStyle(Theme.muted)
+                            Text(label).font(.subheadline.weight(.semibold)).foregroundStyle(Theme.text)
+                            Text(blurb).font(.caption).foregroundStyle(Theme.textMuted)
                         }
                         Spacer()
                         Text("$\(amount)")
                             .font(Theme.moneyFont)
-                            .foregroundStyle(color)
+                            .foregroundStyle(Theme.money)
                     }
                 }
             }

@@ -14,7 +14,7 @@ struct PackagingCameraView: View {
 
     var body: some View {
         ZStack {
-            Color.black.ignoresSafeArea()
+            Theme.void.ignoresSafeArea()
 
             if camera.isReady {
                 CameraPreviewView(session: camera.session)
@@ -23,7 +23,7 @@ struct PackagingCameraView: View {
                 fallbackPicker
             } else {
                 ProgressView()
-                    .tint(.white)
+                    .tint(Theme.chrome)
             }
 
             VStack {
@@ -48,17 +48,17 @@ struct PackagingCameraView: View {
             Button { router.path.removeLast() } label: {
                 Image(systemName: "xmark")
                     .font(.headline)
-                    .foregroundColor(.white)
+                    .foregroundColor(Theme.chrome)
                     .padding(12)
-                    .background(Color.black.opacity(0.4))
+                    .background(Theme.void.opacity(0.55))
                     .clipShape(Circle())
             }
             Spacer()
             Text("Verify packaging")
                 .font(.headline)
-                .foregroundColor(.white)
+                .foregroundColor(Theme.chrome)
                 .padding(.horizontal, 12).padding(.vertical, 6)
-                .background(Color.black.opacity(0.4))
+                .background(Theme.void.opacity(0.55))
                 .clipShape(Capsule())
             Spacer()
             Color.clear.frame(width: 44, height: 44)
@@ -68,14 +68,14 @@ struct PackagingCameraView: View {
 
     private var framingGuide: some View {
         RoundedRectangle(cornerRadius: 24, style: .continuous)
-            .strokeBorder(Color.white.opacity(0.85), style: StrokeStyle(lineWidth: 2, dash: [8, 6]))
+            .strokeBorder(Theme.molten.opacity(0.85), style: StrokeStyle(lineWidth: 2, dash: [8, 6]))
             .frame(width: 280, height: 380)
             .overlay(
                 Text("Frame the whole package")
                     .font(.footnote.weight(.semibold))
-                    .foregroundColor(.white)
+                    .foregroundColor(Theme.chrome)
                     .padding(.horizontal, 10).padding(.vertical, 6)
-                    .background(Color.black.opacity(0.45))
+                    .background(Theme.void.opacity(0.55))
                     .clipShape(Capsule())
                     .offset(y: -180)
             )
@@ -86,9 +86,9 @@ struct PackagingCameraView: View {
             PhotosPicker(selection: $pickerItem, matching: .images) {
                 Image(systemName: "photo.on.rectangle")
                     .font(.title3)
-                    .foregroundColor(.white)
+                    .foregroundColor(Theme.chrome)
                     .padding(14)
-                    .background(Color.black.opacity(0.5))
+                    .background(Theme.void.opacity(0.55))
                     .clipShape(Circle())
             }
 
@@ -96,10 +96,10 @@ struct PackagingCameraView: View {
                 Task { await snap() }
             } label: {
                 ZStack {
-                    Circle().stroke(Color.white, lineWidth: 4).frame(width: 78, height: 78)
-                    Circle().fill(Color.white).frame(width: 64, height: 64)
+                    Circle().stroke(Theme.chrome, lineWidth: 4).frame(width: 78, height: 78)
+                    Circle().fill(Theme.chrome).frame(width: 64, height: 64)
                     if isCapturing || vm.isVerifying {
-                        ProgressView().tint(Theme.purple)
+                        ProgressView().tint(Theme.molten)
                     }
                 }
             }
@@ -112,17 +112,17 @@ struct PackagingCameraView: View {
 
     private var fallbackPicker: some View {
         VStack(spacing: 20) {
-            Image(systemName: "camera.slash.fill").font(.system(size: 44)).foregroundColor(.white)
+            Image(systemName: "camera.slash.fill").font(.system(size: 44)).foregroundColor(Theme.chrome)
             Text(camera.setupError ?? "")
                 .multilineTextAlignment(.center)
-                .foregroundColor(.white)
+                .foregroundColor(Theme.chrome)
                 .padding(.horizontal, 32)
             PhotosPicker(selection: $pickerItem, matching: .images) {
                 Text("Pick from library")
                     .font(.headline)
                     .padding(.horizontal, 24).padding(.vertical, 14)
-                    .background(Color.white)
-                    .foregroundColor(.black)
+                    .background(Theme.earnGradient)
+                    .foregroundColor(Theme.gunmetal)
                     .clipShape(Capsule())
             }
         }
