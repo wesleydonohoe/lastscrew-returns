@@ -32,7 +32,7 @@ struct AcceptHostView: View {
             checklist
 
             Button {
-                router.push(.packagingCamera(item, offer))
+                router.push(.packagingCamera(item, offer, []))
             } label: {
                 HStack {
                     Image(systemName: "camera.fill")

@@ -26,6 +26,8 @@ const MOCK_ITEMS: Record<string, ItemDetails> = {
     deliveredAt: "2026-05-26",
     returnReason: "doesnt_fit",
     status: "delivered",
+    lastScrewEligible: true,
+    estPayoutRange: { low: 95, high: 145 },
   },
   "WF-ORDER-8821": {
     orderId: "WF-ORDER-8821",
@@ -43,6 +45,8 @@ const MOCK_ITEMS: Record<string, ItemDetails> = {
     deliveredAt: "2026-05-17",
     returnReason: "doesnt_fit",
     status: "delivered",
+    lastScrewEligible: true,
+    estPayoutRange: { low: 120, high: 175 },
   },
   "WF-ORDER-8826": {
     orderId: "WF-ORDER-8826",
@@ -60,13 +64,15 @@ const MOCK_ITEMS: Record<string, ItemDetails> = {
     deliveredAt: "2026-05-23",
     returnReason: "doesnt_fit",
     status: "delivered",
+    lastScrewEligible: true,
+    estPayoutRange: { low: 130, high: 195 },
   },
   "WF-ORDER-8822": {
     orderId: "WF-ORDER-8822",
     sku: "WF-SOFA-3SEAT-VLV",
     name: "Velvet 3-Seat Sectional Sofa",
     brand: "Wade Logan®",
-    imageAsset: "MattressHero",
+    imageAsset: "VelvetSofa",
     retailPriceUsd: 1299,
     customerPaidUsd: 1099,
     assemblyTimeMinutes: 75,
@@ -77,13 +83,15 @@ const MOCK_ITEMS: Record<string, ItemDetails> = {
     deliveredAt: "2026-05-19",
     returnReason: "color_mismatch",
     status: "delivered",
+    lastScrewEligible: true,
+    estPayoutRange: { low: 180, high: 245 },
   },
   "WF-ORDER-8823": {
     orderId: "WF-ORDER-8823",
     sku: "WF-DESK-MCM-WAL",
     name: "Mid-Century Walnut Writing Desk",
     brand: "George Oliver®",
-    imageAsset: "MattressHero",
+    imageAsset: "WalnutDesk",
     retailPriceUsd: 349,
     customerPaidUsd: 299,
     assemblyTimeMinutes: 38,
@@ -94,13 +102,15 @@ const MOCK_ITEMS: Record<string, ItemDetails> = {
     deliveredAt: "2026-05-21",
     returnReason: "doesnt_fit",
     status: "delivered",
+    lastScrewEligible: false,
+    ineligibleReason: "Final-sale item — Wayfair return policy excludes this SKU from Last Screw.",
   },
   "WF-ORDER-8824": {
     orderId: "WF-ORDER-8824",
     sku: "WF-DINING-6P-OAK",
     name: "Farmhouse Oak Dining Set (table + 6 chairs)",
     brand: "Three Posts™",
-    imageAsset: "MattressHero",
+    imageAsset: "FarmhouseDining",
     retailPriceUsd: 899,
     customerPaidUsd: 779,
     assemblyTimeMinutes: 124,
@@ -111,13 +121,15 @@ const MOCK_ITEMS: Record<string, ItemDetails> = {
     deliveredAt: "2026-05-18",
     returnReason: "changed_mind",
     status: "delivered",
+    lastScrewEligible: false,
+    ineligibleReason: "Open damage claim on this order — resolve with Wayfair Support first.",
   },
   "WF-ORDER-8825": {
     orderId: "WF-ORDER-8825",
     sku: "WF-LAMP-ARC-BRS",
     name: 'Brass Arc Floor Lamp 68" Adjustable',
     brand: "Mercer41™",
-    imageAsset: "MattressHero",
+    imageAsset: "ArcFloorLamp",
     retailPriceUsd: 189,
     customerPaidUsd: 159,
     assemblyTimeMinutes: 14,
@@ -128,6 +140,8 @@ const MOCK_ITEMS: Record<string, ItemDetails> = {
     deliveredAt: "2026-05-22",
     returnReason: "wrong_color",
     status: "delivered",
+    lastScrewEligible: false,
+    ineligibleReason: "Below the $200 Last Screw payout floor — standard return is faster.",
   },
 };
 
@@ -154,6 +168,12 @@ export interface ItemDetails {
   deliveredAt: string;
   returnReason: string;
   status: "delivered" | "in_transit" | "returned";
+  /** Whether this item can use the Last Screw host program. */
+  lastScrewEligible: boolean;
+  /** When ineligible, why — shown in the UI. */
+  ineligibleReason?: string;
+  /** Rough payout estimate ($X-$Y) shown on the eligible card before full agent run. */
+  estPayoutRange?: { low: number; high: number };
 }
 
 export function getMockItem(orderId: string): ItemDetails | undefined {

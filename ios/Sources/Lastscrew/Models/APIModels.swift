@@ -17,6 +17,14 @@ struct ItemDetails: Codable, Hashable, Identifiable {
     let deliveredAt: String
     let returnReason: String
     let status: String
+    let lastScrewEligible: Bool
+    let ineligibleReason: String?
+    let estPayoutRange: PayoutRange?
+}
+
+struct PayoutRange: Codable, Hashable {
+    let low: Int
+    let high: Int
 }
 
 struct OrdersResponse: Codable {
@@ -139,7 +147,10 @@ extension ItemDetails {
         category: "bedroom",
         deliveredAt: "2026-05-17",
         returnReason: "doesnt_fit",
-        status: "delivered"
+        status: "delivered",
+        lastScrewEligible: true,
+        ineligibleReason: nil,
+        estPayoutRange: PayoutRange(low: 120, high: 175)
     )
 
     static let demoFeed: [ItemDetails] = [
@@ -153,7 +164,9 @@ extension ItemDetails {
             assemblyTimeMinutes: 68, packagingDifficulty: "medium",
             dimensions: "Twin 41\"W x 78\"L x 14\"H", weightLbs: 78,
             category: "bedroom", deliveredAt: "2026-05-26",
-            returnReason: "doesnt_fit", status: "delivered"
+            returnReason: "doesnt_fit", status: "delivered",
+            lastScrewEligible: true, ineligibleReason: nil,
+            estPayoutRange: PayoutRange(low: 95, high: 145)
         ),
         .demo,
         ItemDetails(
@@ -166,7 +179,9 @@ extension ItemDetails {
             assemblyTimeMinutes: 84, packagingDifficulty: "hard",
             dimensions: "Twin 42\"W x 80\"L x 36\"H", weightLbs: 96,
             category: "bedroom", deliveredAt: "2026-05-23",
-            returnReason: "doesnt_fit", status: "delivered"
+            returnReason: "doesnt_fit", status: "delivered",
+            lastScrewEligible: true, ineligibleReason: nil,
+            estPayoutRange: PayoutRange(low: 130, high: 195)
         )
     ]
 }

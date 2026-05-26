@@ -5,7 +5,7 @@ enum AppRoute: Hashable {
     case returnChooser(ItemDetails)
     case offerReveal(ItemDetails)
     case acceptHost(ItemDetails, HostOffer)
-    case packagingCamera(ItemDetails, HostOffer)
+    case packagingCamera(ItemDetails, HostOffer, [String])
     case packagingResult(ItemDetails, HostOffer, PackagingQAResult)
     case hostDashboard(ItemDetails, HostOffer, PackagingQAResult)
 }

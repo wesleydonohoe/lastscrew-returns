@@ -14,11 +14,15 @@ struct PackagingResultView: View {
                 bonusCard
                 notesCard
 
+                if qa.verdict != "pass" {
+                    howToFixSection
+                }
+
                 if qa.verdict == "pass" {
                     primaryCTA
                 } else {
                     HStack(spacing: 12) {
-                        retryButton
+                        retakeWithTipsButton
                         if qa.verdict == "needs_work" { proceedAnywayButton }
                     }
                 }
@@ -105,6 +109,91 @@ struct PackagingResultView: View {
         .cardStyle()
     }
 
+    // MARK: - How-to-fix section
+
+    private var failedItems: [PackagingChecklistItem] {
+        qa.checklist.filter { !$0.passed }
+    }
+
+    private var retakeTips: [String] {
+        failedItems.map { tip(for: $0.label) }
+    }
+
+    private var howToFixSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 6) {
+                Image(systemName: "wand.and.stars")
+                    .foregroundColor(Theme.molten)
+                Text("How to fix it")
+                    .font(.headline)
+                    .foregroundStyle(Theme.text)
+                Spacer()
+                Text("PACKAGING COACH")
+                    .font(.caption2.weight(.heavy))
+                    .tracking(1.5)
+                    .padding(.horizontal, 6).padding(.vertical, 2)
+                    .background(Theme.molten.opacity(0.18))
+                    .foregroundColor(Theme.molten)
+                    .clipShape(Capsule())
+            }
+
+            ForEach(failedItems) { c in
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "arrow.right.circle.fill")
+                            .foregroundColor(Theme.molten)
+                            .font(.caption)
+                        Text(c.label)
+                            .font(.subheadline.weight(.heavy))
+                            .foregroundStyle(Theme.text)
+                    }
+                    Text(tip(for: c.label))
+                        .font(.subheadline)
+                        .foregroundStyle(Theme.textMuted)
+                        .padding(.leading, 20)
+                }
+                .padding(12)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Theme.surfaceRaised)
+                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .stroke(Theme.molten.opacity(0.3), lineWidth: 1)
+                )
+            }
+        }
+        .cardStyle()
+    }
+
+    /// Maps a failed checklist label to a concrete retake tip for the host.
+    private func tip(for label: String) -> String {
+        let lower = label.lowercased()
+        if lower.contains("dismantled") {
+            return "Break the item down into shippable parts. Re-shoot showing the disassembled pieces side-by-side."
+        }
+        if lower.contains("wrapped") {
+            return "Wrap each part in original packaging, blanket, or shrink wrap. Re-shoot from a wider angle so all parts are visible."
+        }
+        if lower.contains("corner") || lower.contains("edge") || lower.contains("pad") {
+            return "Add foam or bubble wrap to corners and edges. Re-shoot from a 45° angle so the padding is visible."
+        }
+        if lower.contains("box") || lower.contains("container") || lower.contains("rigid") {
+            return "Use the original box or a comparable rigid container. Soft bags or torn cardboard won't pass."
+        }
+        if lower.contains("tape") || lower.contains("closed") || lower.contains("seam") {
+            return "Tape both top and bottom seams in an H pattern. Re-shoot from above showing the top seam."
+        }
+        if lower.contains("label") || lower.contains("dry") {
+            return "Keep the label area clear, dry, and unobstructed. Wipe away dust and stickers. Re-shoot the label area straight on."
+        }
+        if lower.contains("damage") || lower.contains("stain") || lower.contains("wet") {
+            return "Re-wrap with clean, dry material. If anything is torn or stained, replace before re-shooting."
+        }
+        return "Address this item and re-shoot from a clearer angle."
+    }
+
+    // MARK: - CTAs
+
     private var primaryCTA: some View {
         Button {
             router.push(.hostDashboard(item, offer, qa))
@@ -122,17 +211,24 @@ struct PackagingResultView: View {
         }
     }
 
-    private var retryButton: some View {
+    private var retakeWithTipsButton: some View {
         Button {
-            router.path.removeLast()  // back to camera
+            // Pop back to PackagingCamera, then push a new camera with tips overlay.
+            // Simplest: pop the result + camera, then push a fresh camera with tips.
+            if router.path.count >= 2 { router.path.removeLast(2) }
+            router.push(.packagingCamera(item, offer, retakeTips))
         } label: {
-            HStack { Image(systemName: "arrow.clockwise"); Text("Re-shoot") }
-                .frame(maxWidth: .infinity)
-                .font(.headline).foregroundColor(Theme.text)
-                .padding(.vertical, 14)
-                .background(Theme.surface)
-                .overlay(RoundedRectangle(cornerRadius: 12).stroke(Theme.border, lineWidth: 1))
-                .clipShape(RoundedRectangle(cornerRadius: 12))
+            HStack {
+                Image(systemName: "camera.fill")
+                Text("Retake with tips")
+                    .font(.headline)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 14)
+            .foregroundColor(Theme.gunmetal)
+            .background(Theme.earnGradient)
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .shadow(color: Theme.molten.opacity(0.4), radius: 12, y: 4)
         }
     }
 
@@ -142,9 +238,10 @@ struct PackagingResultView: View {
         } label: {
             HStack { Text("Proceed anyway"); Image(systemName: "arrow.right") }
                 .frame(maxWidth: .infinity)
-                .font(.headline).foregroundColor(Theme.gunmetal)
+                .font(.headline).foregroundColor(Theme.text)
                 .padding(.vertical, 14)
-                .background(Theme.accent)
+                .background(Theme.surface)
+                .overlay(RoundedRectangle(cornerRadius: 12).stroke(Theme.border, lineWidth: 1))
                 .clipShape(RoundedRectangle(cornerRadius: 12))
         }
     }
