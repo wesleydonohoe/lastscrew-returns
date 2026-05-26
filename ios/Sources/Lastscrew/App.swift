@@ -8,8 +8,8 @@ struct LastscrewApp: App {
         WindowGroup {
             RootView()
                 .environmentObject(router)
-                .preferredColorScheme(.light)
-                .tint(Theme.purple)
+                .preferredColorScheme(.dark)
+                .tint(Theme.accent)
         }
     }
 }

@@ -10,19 +10,20 @@ struct AcceptHostView: View {
             Spacer()
             VStack(spacing: 12) {
                 ZStack {
-                    Circle().fill(Theme.green.opacity(0.15)).frame(width: 96, height: 96)
+                    Circle().fill(Theme.money.opacity(0.18)).frame(width: 96, height: 96)
                     Image(systemName: "checkmark.seal.fill")
                         .font(.system(size: 56))
-                        .foregroundColor(Theme.green)
+                        .foregroundColor(Theme.money)
                 }
                 Text("You're a host.")
                     .font(Theme.titleFont)
+                    .foregroundStyle(Theme.text)
                 Text("$\(offer.signingBonusUsd) credited to your Wayfair Rewards.")
-                    .font(.headline)
-                    .foregroundStyle(Theme.purple)
-                Text("Next: wrap the item in its original packaging (or comparable), then photograph it so we can verify it's ship-ready.")
+                    .font(Theme.moneyFont)
+                    .foregroundStyle(Theme.money)
+                Text("Next: dismantle the item, repack it in its original box (or comparable), then photograph it so our vision model can verify it's ship-ready. The labor bonus unlocks once QA passes.")
                     .font(.subheadline)
-                    .foregroundStyle(Theme.muted)
+                    .foregroundStyle(Theme.textMuted)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 24)
             }
@@ -41,9 +42,10 @@ struct AcceptHostView: View {
                     Image(systemName: "arrow.right")
                 }
                 .padding(.vertical, 16).padding(.horizontal, 20)
-                .foregroundColor(.white)
+                .foregroundColor(Theme.gunmetal)
                 .background(Theme.earnGradient)
                 .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                .shadow(color: Theme.molten.opacity(0.4), radius: 16, y: 8)
             }
         }
         .padding(24)
@@ -54,20 +56,23 @@ struct AcceptHostView: View {
 
     private var checklist: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Packaging checklist")
+            Text("Dismantle + repackage checklist")
                 .font(.headline)
+                .foregroundStyle(Theme.text)
             ForEach([
-                "Wrap fully in blanket, shrink wrap, or original packaging",
+                "Dismantle in reverse assembly order — keep hardware bagged",
+                "Wrap each part in original packaging or blanket",
                 "Pad corners and edges",
-                "Use a rigid container or original box",
+                "Use the original box or a comparable rigid container",
                 "Tape both top and bottom seams",
-                "Keep label area clear and dry",
+                "Keep the label area clear and dry",
             ], id: \.self) { item in
                 HStack(alignment: .top, spacing: 8) {
                     Image(systemName: "circle")
-                        .foregroundColor(Theme.muted)
+                        .foregroundColor(Theme.textMuted)
                     Text(item)
                         .font(.subheadline)
+                        .foregroundStyle(Theme.text)
                 }
             }
         }

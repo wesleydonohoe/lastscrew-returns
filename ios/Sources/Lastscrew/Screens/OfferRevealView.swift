@@ -35,21 +35,25 @@ struct OfferRevealView: View {
 
     private var heroNumber: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Keep it. Earn up to")
+            Text("Dismantle it. Earn up to")
                 .font(Theme.headingFont)
                 .foregroundStyle(Theme.text)
-            HStack(alignment: .firstTextBaseline, spacing: 6) {
-                Text("$")
-                    .font(.system(size: 28, weight: .bold, design: .rounded))
-                    .foregroundStyle(Theme.purple)
-                Text("\(vm.offer?.projectedMaxEarningsUsd ?? 0)")
-                    .font(Theme.bigMoneyFont)
-                    .foregroundStyle(Theme.purpleDeep)
-                    .contentTransition(.numericText(value: Double(vm.offer?.projectedMaxEarningsUsd ?? 0)))
+            ZStack {
+                Theme.heatHalo.frame(height: 60).blendMode(.plusLighter)
+                HStack(alignment: .firstTextBaseline, spacing: 6) {
+                    Text("$")
+                        .font(.system(size: 28, weight: .heavy, design: .monospaced))
+                        .foregroundStyle(Theme.money)
+                    Text("\(vm.offer?.projectedMaxEarningsUsd ?? 0)")
+                        .font(Theme.bigMoneyFont)
+                        .foregroundStyle(Theme.money)
+                        .contentTransition(.numericText(value: Double(vm.offer?.projectedMaxEarningsUsd ?? 0)))
+                    Spacer()
+                }
             }
-            Text("on top of your full refund — for \(item.name).")
+            Text("for the work you'd be doing anyway. On top of your full refund.")
                 .font(.subheadline)
-                .foregroundStyle(Theme.muted)
+                .foregroundStyle(Theme.textMuted)
         }
     }
 
@@ -57,7 +61,11 @@ struct OfferRevealView: View {
         VStack(spacing: 12) {
             ForEach(0..<4) { _ in
                 RoundedRectangle(cornerRadius: 12)
-                    .fill(Color(white: 0.93))
+                    .fill(Theme.surface)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(Theme.border, lineWidth: 1)
+                    )
                     .frame(height: 72)
             }
         }
@@ -67,9 +75,10 @@ struct OfferRevealView: View {
         VStack(alignment: .leading, spacing: 6) {
             HStack(spacing: 6) {
                 Image(systemName: "brain.head.profile")
-                    .foregroundColor(Theme.purple)
+                    .foregroundColor(Theme.accent)
                 Text("Why this offer")
                     .font(.headline)
+                    .foregroundStyle(Theme.text)
             }
             Text(offer.reasoning)
                 .font(.subheadline)
@@ -83,7 +92,7 @@ struct OfferRevealView: View {
             Spacer()
             Text(offer.source == "subconscious" ? "Priced by Subconscious agent" : "Priced by fallback model")
                 .font(.caption)
-                .foregroundStyle(Theme.muted)
+                .foregroundStyle(Theme.textFaint)
         }
     }
 
@@ -98,10 +107,10 @@ struct OfferRevealView: View {
                 Image(systemName: "arrow.right")
             }
             .padding(.vertical, 16).padding(.horizontal, 20)
-            .foregroundColor(.white)
+            .foregroundColor(Theme.gunmetal)
             .background(Theme.earnGradient)
             .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-            .shadow(color: Theme.purple.opacity(0.3), radius: 14, y: 6)
+            .shadow(color: Theme.molten.opacity(0.5), radius: 18, y: 8)
         }
         .padding(.horizontal, 20)
         .padding(.bottom, 16)
