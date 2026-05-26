@@ -213,10 +213,10 @@ struct PackagingResultView: View {
 
     private var retakeWithTipsButton: some View {
         Button {
-            // Pop back to PackagingCamera, then push a new camera with tips overlay.
-            // Simplest: pop the result + camera, then push a fresh camera with tips.
-            if router.path.count >= 2 { router.path.removeLast(2) }
-            router.push(.packagingCamera(item, offer, retakeTips))
+            // Pop back to the existing PackagingCameraView so its AVCaptureSession
+            // stays alive. Tips ride along via the shared AppRouter state.
+            router.retakeTips = retakeTips
+            router.path.removeLast()
         } label: {
             HStack {
                 Image(systemName: "camera.fill")
