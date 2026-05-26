@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" role="img" aria-label="Walnut desk being lowered into a flat shipping box with foam padding">
+  <rect width="600" height="400" fill="#FAFAFA"/>
+  <line x1="0" y1="340" x2="600" y2="340" stroke="#E5E5E5" stroke-width="2"/>
+
+  <!-- Open flat box -->
+  <g>
+    <path d="M80 200 L520 200 L500 170 L100 170 Z" fill="#C99566" stroke="#8E5A2E" stroke-width="2"/>
+    <path d="M80 200 L80 320 L60 340 L60 220 Z" fill="#A0703C" stroke="#8E5A2E" stroke-width="2"/>
+    <path d="M520 200 L520 320 L540 340 L540 220 Z" fill="#A0703C" stroke="#8E5A2E" stroke-width="2"/>
+    <rect x="80" y="200" width="440" height="130" fill="#C99566" stroke="#8E5A2E" stroke-width="2"/>
+  </g>
+
+  <!-- Foam padding inside -->
+  <rect x="90" y="210" width="420" height="14" rx="3" fill="#FFF" stroke="#E0E0E0"/>
+  <rect x="90" y="305" width="420" height="14" rx="3" fill="#FFF" stroke="#E0E0E0"/>
+
+  <!-- Desk parts stacked in box -->
+  <g>
+    <rect x="100" y="230" width="400" height="22" fill="#6B4226"/>
+    <rect x="100" y="230" width="400" height="22" fill="url(#walnut2)" opacity="0.35"/>
+    <rect x="100" y="258" width="180" height="18" fill="#8A5A36"/>
+    <rect x="290" y="258" width="210" height="18" fill="#7A4E2E"/>
+    <rect x="100" y="282" width="120" height="18" fill="#6B4226"/>
+    <rect x="225" y="282" width="120" height="18" fill="#6B4226"/>
+    <rect x="350" y="282" width="60" height="18" fill="#6B4226"/>
+    <rect x="415" y="282" width="60" height="18" fill="#6B4226"/>
+  </g>
+
+  <!-- Bubble wrap overlay -->
+  <g opacity="0.45">
+    <circle cx="160" cy="241" r="6" fill="#FFF" stroke="#BCD7EE"/>
+    <circle cx="180" cy="241" r="6" fill="#FFF" stroke="#BCD7EE"/>
+    <circle cx="200" cy="241" r="6" fill="#FFF" stroke="#BCD7EE"/>
+    <circle cx="220" cy="241" r="6" fill="#FFF" stroke="#BCD7EE"/>
+    <circle cx="240" cy="241" r="6" fill="#FFF" stroke="#BCD7EE"/>
+    <circle cx="170" cy="269" r="6" fill="#FFF" stroke="#BCD7EE"/>
+    <circle cx="190" cy="269" r="6" fill="#FFF" stroke="#BCD7EE"/>
+    <circle cx="210" cy="269" r="6" fill="#FFF" stroke="#BCD7EE"/>
+  </g>
+
+  <!-- Motion arrow -->
+  <g stroke="#7B189F" stroke-width="3" fill="none" stroke-linecap="round">
+    <path d="M300 100 L300 160"/>
+    <path d="M290 150 L300 165 L310 150"/>
+  </g>
+  <text x="300" y="90" font-family="-apple-system,Helvetica,Arial" font-size="13" font-weight="600" fill="#7B189F" text-anchor="middle">Packing</text>
+
+  <!-- Caption -->
+  <text x="300" y="378" font-family="-apple-system,Helvetica,Arial" font-size="16" font-weight="600" fill="#1A1A1A" text-anchor="middle">Walnut Desk — into the box</text>
+
+  <defs>
+    <pattern id="walnut2" width="20" height="20" patternUnits="userSpaceOnUse">
+      <path d="M0 10 Q10 14 20 10" stroke="#4A2D1A" stroke-width="0.6" fill="none"/>
+    </pattern>
+  </defs>
+</svg>

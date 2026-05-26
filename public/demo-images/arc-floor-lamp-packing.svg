@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" role="img" aria-label="Arc floor lamp components being packed with bubble wrap into a tall box">
+  <rect width="600" height="400" fill="#FAFAFA"/>
+  <line x1="0" y1="340" x2="600" y2="340" stroke="#E5E5E5" stroke-width="2"/>
+
+  <!-- Tall open box -->
+  <g>
+    <path d="M180 130 L420 130 L400 105 L200 105 Z" fill="#C99566" stroke="#8E5A2E" stroke-width="2"/>
+    <path d="M180 130 L180 320 L160 340 L160 150 Z" fill="#A0703C" stroke="#8E5A2E" stroke-width="2"/>
+    <path d="M420 130 L420 320 L440 340 L440 150 Z" fill="#A0703C" stroke="#8E5A2E" stroke-width="2"/>
+    <rect x="180" y="130" width="240" height="190" fill="#C99566" stroke="#8E5A2E" stroke-width="2"/>
+  </g>
+
+  <!-- Foam insert outline -->
+  <rect x="190" y="140" width="220" height="170" fill="#FFF" stroke="#E0E0E0" stroke-dasharray="3 3"/>
+
+  <!-- Pole pieces packed vertical, wrapped -->
+  <g>
+    <rect x="210" y="150" width="14" height="150" fill="#52525B"/>
+    <rect x="232" y="150" width="14" height="150" fill="#52525B"/>
+    <!-- bubble wrap -->
+    <g opacity="0.5">
+      <circle cx="217" cy="170" r="5" fill="#FFF" stroke="#BCD7EE"/>
+      <circle cx="217" cy="200" r="5" fill="#FFF" stroke="#BCD7EE"/>
+      <circle cx="217" cy="230" r="5" fill="#FFF" stroke="#BCD7EE"/>
+      <circle cx="217" cy="260" r="5" fill="#FFF" stroke="#BCD7EE"/>
+      <circle cx="239" cy="170" r="5" fill="#FFF" stroke="#BCD7EE"/>
+      <circle cx="239" cy="200" r="5" fill="#FFF" stroke="#BCD7EE"/>
+      <circle cx="239" cy="230" r="5" fill="#FFF" stroke="#BCD7EE"/>
+      <circle cx="239" cy="260" r="5" fill="#FFF" stroke="#BCD7EE"/>
+    </g>
+  </g>
+
+  <!-- Base in box (bottom) -->
+  <rect x="270" y="260" width="120" height="40" rx="4" fill="#52525B"/>
+
+  <!-- Shade being lowered (wrapped) -->
+  <g transform="translate(300,30)">
+    <path d="M0 30 L100 30 L80 100 L20 100 Z" fill="#F4E5C2" stroke="#A88B4E" stroke-width="2"/>
+    <path d="M0 30 L100 30 L100 26 L0 26 Z" fill="#A88B4E"/>
+    <!-- wrap -->
+    <rect x="-10" y="20" width="120" height="90" fill="#FFF" opacity="0.35" stroke="#BCD7EE" stroke-dasharray="2 2"/>
+  </g>
+
+  <!-- Motion arrow -->
+  <g stroke="#7B189F" stroke-width="3" fill="none" stroke-linecap="round">
+    <path d="M350 130 L350 90"/>
+    <path d="M342 100 L350 88 L358 100"/>
+  </g>
+
+  <!-- "FRAGILE" tag -->
+  <g transform="translate(60,200) rotate(-12)">
+    <rect width="100" height="34" fill="#FFF" stroke="#C32D2D" stroke-width="2" rx="3"/>
+    <text x="50" y="22" font-family="-apple-system,Helvetica,Arial" font-size="13" font-weight="800" fill="#C32D2D" text-anchor="middle">FRAGILE</text>
+  </g>
+
+  <!-- Caption -->
+  <text x="300" y="378" font-family="-apple-system,Helvetica,Arial" font-size="16" font-weight="600" fill="#1A1A1A" text-anchor="middle">Arc Floor Lamp — into the box</text>
+</svg>

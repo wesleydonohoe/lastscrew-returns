@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" role="img" aria-label="Velvet sofa dismantled into panels, cushions, legs and hardware">
+  <rect width="600" height="400" fill="#FAFAFA"/>
+  <!-- floor line -->
+  <line x1="0" y1="340" x2="600" y2="340" stroke="#E5E5E5" stroke-width="2"/>
+
+  <!-- Back panel -->
+  <g>
+    <rect x="60" y="80" width="220" height="90" rx="10" fill="#7B189F"/>
+    <rect x="60" y="80" width="220" height="90" rx="10" fill="url(#velvet)" opacity="0.25"/>
+    <rect x="74" y="92" width="192" height="66" rx="6" fill="none" stroke="#FAFAFA" stroke-width="2" stroke-dasharray="4 4"/>
+  </g>
+
+  <!-- Seat base -->
+  <rect x="320" y="100" width="200" height="60" rx="8" fill="#5A1276"/>
+
+  <!-- Seat cushions -->
+  <rect x="60" y="220" width="120" height="70" rx="14" fill="#7B189F"/>
+  <rect x="200" y="220" width="120" height="70" rx="14" fill="#7B189F"/>
+
+  <!-- Arm panels -->
+  <rect x="340" y="200" width="80" height="110" rx="8" fill="#5A1276"/>
+  <rect x="440" y="200" width="80" height="110" rx="8" fill="#5A1276"/>
+
+  <!-- Legs -->
+  <g fill="#1A1A1A">
+    <rect x="100" y="320" width="10" height="20" rx="2"/>
+    <rect x="160" y="320" width="10" height="20" rx="2"/>
+    <rect x="220" y="320" width="10" height="20" rx="2"/>
+    <rect x="280" y="320" width="10" height="20" rx="2"/>
+  </g>
+
+  <!-- Hardware bag -->
+  <g transform="translate(420,295)">
+    <path d="M0 12 L60 12 L60 45 L0 45 Z" fill="#FFF" stroke="#1A1A1A" stroke-width="2"/>
+    <path d="M0 12 L60 12 L50 0 L10 0 Z" fill="#E5E5E5" stroke="#1A1A1A" stroke-width="2"/>
+    <circle cx="15" cy="28" r="3" fill="#7B189F"/>
+    <circle cx="30" cy="28" r="3" fill="#7B189F"/>
+    <circle cx="45" cy="28" r="3" fill="#7B189F"/>
+    <rect x="12" y="36" width="36" height="4" fill="#0E9F6E"/>
+  </g>
+
+  <!-- Caption -->
+  <text x="300" y="375" font-family="-apple-system,Helvetica,Arial" font-size="16" font-weight="600" fill="#1A1A1A" text-anchor="middle">Velvet Sofa — dismantled</text>
+
+  <defs>
+    <pattern id="velvet" width="6" height="6" patternUnits="userSpaceOnUse">
+      <rect width="6" height="6" fill="#7B189F"/>
+      <path d="M0 3 L6 3" stroke="#FAFAFA" stroke-width="0.5" opacity="0.6"/>
+    </pattern>
+  </defs>
+</svg>

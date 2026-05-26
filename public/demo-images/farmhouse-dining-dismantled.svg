@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" role="img" aria-label="Farmhouse dining table dismantled into tabletop planks, trestle legs and hardware">
+  <rect width="600" height="400" fill="#FAFAFA"/>
+  <line x1="0" y1="340" x2="600" y2="340" stroke="#E5E5E5" stroke-width="2"/>
+
+  <!-- Tabletop planks stacked -->
+  <g>
+    <rect x="60" y="80" width="380" height="22" fill="#B98856"/>
+    <rect x="60" y="80" width="380" height="22" fill="url(#plank)" opacity="0.4"/>
+    <rect x="60" y="105" width="380" height="22" fill="#A87545"/>
+    <rect x="60" y="105" width="380" height="22" fill="url(#plank)" opacity="0.4"/>
+    <rect x="60" y="130" width="380" height="22" fill="#C09666"/>
+    <rect x="60" y="130" width="380" height="22" fill="url(#plank)" opacity="0.4"/>
+    <rect x="60" y="155" width="380" height="22" fill="#A87545"/>
+    <rect x="60" y="155" width="380" height="22" fill="url(#plank)" opacity="0.4"/>
+  </g>
+
+  <!-- Trestle leg 1 -->
+  <g transform="translate(80,200)">
+    <rect x="0" y="0" width="120" height="14" fill="#7A4E2E"/>
+    <rect x="50" y="14" width="20" height="100" fill="#7A4E2E"/>
+    <rect x="0" y="110" width="120" height="14" fill="#7A4E2E"/>
+  </g>
+
+  <!-- Trestle leg 2 -->
+  <g transform="translate(240,200)">
+    <rect x="0" y="0" width="120" height="14" fill="#7A4E2E"/>
+    <rect x="50" y="14" width="20" height="100" fill="#7A4E2E"/>
+    <rect x="0" y="110" width="120" height="14" fill="#7A4E2E"/>
+  </g>
+
+  <!-- Stretcher bar -->
+  <rect x="400" y="240" width="120" height="14" fill="#7A4E2E"/>
+
+  <!-- Hardware bag -->
+  <g transform="translate(460,285)">
+    <path d="M0 12 L60 12 L60 50 L0 50 Z" fill="#FFF" stroke="#1A1A1A" stroke-width="2"/>
+    <path d="M0 12 L60 12 L50 0 L10 0 Z" fill="#E5E5E5" stroke="#1A1A1A" stroke-width="2"/>
+    <g fill="#7A4E2E">
+      <circle cx="14" cy="24" r="3"/>
+      <circle cx="24" cy="24" r="3"/>
+      <circle cx="34" cy="24" r="3"/>
+      <circle cx="44" cy="24" r="3"/>
+      <rect x="10" y="32" width="40" height="3"/>
+      <rect x="10" y="38" width="40" height="3"/>
+    </g>
+  </g>
+
+  <!-- Caption -->
+  <text x="300" y="378" font-family="-apple-system,Helvetica,Arial" font-size="16" font-weight="600" fill="#1A1A1A" text-anchor="middle">Farmhouse Dining Table — dismantled</text>
+
+  <defs>
+    <pattern id="plank" width="22" height="22" patternUnits="userSpaceOnUse">
+      <path d="M0 11 Q11 16 22 11" stroke="#5E3D1A" stroke-width="0.7" fill="none"/>
+    </pattern>
+  </defs>
+</svg>

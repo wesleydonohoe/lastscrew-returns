@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Lastscrew · demo images</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    :root {
+      --purple: #7B189F;
+      --accent: #0E9F6E;
+      --bg: #FAFAFA;
+      --text: #1A1A1A;
+      --muted: #6B7280;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 15px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    }
+    header {
+      padding: 32px 32px 8px;
+      border-bottom: 1px solid #EEE;
+    }
+    h1 { margin: 0 0 4px; font-size: 24px; color: var(--purple); }
+    p.lede { margin: 0; color: var(--muted); }
+    main { padding: 24px 32px 64px; }
+    section { margin-bottom: 40px; }
+    section h2 {
+      font-size: 18px;
+      margin: 0 0 12px;
+      letter-spacing: 0.2px;
+    }
+    .row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    figure {
+      margin: 0;
+      background: #FFF;
+      border: 1px solid #ECECEC;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    }
+    figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      background: var(--bg);
+    }
+    figcaption {
+      padding: 10px 14px;
+      font-size: 13px;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    figcaption .state {
+      font-weight: 600;
+      color: var(--text);
+    }
+    figcaption code {
+      font-size: 11px;
+      color: var(--muted);
+    }
+    @media (max-width: 800px) {
+      .row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Lastscrew demo images</h1>
+    <p class="lede">Dismantled → packing → boxed, for four hero items.</p>
+  </header>
+  <main>
+    <section>
+      <h2>Velvet Sofa</h2>
+      <div class="row">
+        <figure><img src="velvet-sofa-dismantled.svg" alt="Velvet sofa dismantled"><figcaption><span class="state">Dismantled</span><code>velvet-sofa-dismantled.svg</code></figcaption></figure>
+        <figure><img src="velvet-sofa-packing.svg" alt="Velvet sofa being packed"><figcaption><span class="state">Into the box</span><code>velvet-sofa-packing.svg</code></figcaption></figure>
+        <figure><img src="velvet-sofa-boxed.svg" alt="Velvet sofa boxed"><figcaption><span class="state">Boxed</span><code>velvet-sofa-boxed.svg</code></figcaption></figure>
+      </div>
+    </section>
+
+    <section>
+      <h2>Walnut Desk</h2>
+      <div class="row">
+        <figure><img src="walnut-desk-dismantled.svg" alt="Walnut desk dismantled"><figcaption><span class="state">Dismantled</span><code>walnut-desk-dismantled.svg</code></figcaption></figure>
+        <figure><img src="walnut-desk-packing.svg" alt="Walnut desk being packed"><figcaption><span class="state">Into the box</span><code>walnut-desk-packing.svg</code></figcaption></figure>
+        <figure><img src="walnut-desk-boxed.svg" alt="Walnut desk boxed"><figcaption><span class="state">Boxed</span><code>walnut-desk-boxed.svg</code></figcaption></figure>
+      </div>
+    </section>
+
+    <section>
+      <h2>Farmhouse Dining Table</h2>
+      <div class="row">
+        <figure><img src="farmhouse-dining-dismantled.svg" alt="Farmhouse dining table dismantled"><figcaption><span class="state">Dismantled</span><code>farmhouse-dining-dismantled.svg</code></figcaption></figure>
+        <figure><img src="farmhouse-dining-packing.svg" alt="Farmhouse dining table being packed"><figcaption><span class="state">Into the box</span><code>farmhouse-dining-packing.svg</code></figcaption></figure>
+        <figure><img src="farmhouse-dining-boxed.svg" alt="Farmhouse dining table boxed"><figcaption><span class="state">Boxed</span><code>farmhouse-dining-boxed.svg</code></figcaption></figure>
+      </div>
+    </section>
+
+    <section>
+      <h2>Arc Floor Lamp</h2>
+      <div class="row">
+        <figure><img src="arc-floor-lamp-dismantled.svg" alt="Arc floor lamp dismantled"><figcaption><span class="state">Dismantled</span><code>arc-floor-lamp-dismantled.svg</code></figcaption></figure>
+        <figure><img src="arc-floor-lamp-packing.svg" alt="Arc floor lamp being packed"><figcaption><span class="state">Into the box</span><code>arc-floor-lamp-packing.svg</code></figcaption></figure>
+        <figure><img src="arc-floor-lamp-boxed.svg" alt="Arc floor lamp boxed"><figcaption><span class="state">Boxed</span><code>arc-floor-lamp-boxed.svg</code></figcaption></figure>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

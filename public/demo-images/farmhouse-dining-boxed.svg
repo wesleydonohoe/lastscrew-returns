@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" role="img" aria-label="Farmhouse dining table sealed in a long flat box with shipping label">
+  <rect width="600" height="400" fill="#FAFAFA"/>
+  <line x1="0" y1="340" x2="600" y2="340" stroke="#E5E5E5" stroke-width="2"/>
+
+  <!-- Long flat box -->
+  <g>
+    <path d="M40 180 L560 180 L580 158 L60 158 Z" fill="#A0703C" stroke="#8E5A2E" stroke-width="2"/>
+    <path d="M560 180 L560 310 L580 290 L580 158 Z" fill="#8E5A2E" stroke="#5E3D1A" stroke-width="2"/>
+    <rect x="40" y="180" width="520" height="130" fill="#C99566" stroke="#8E5A2E" stroke-width="2"/>
+  </g>
+
+  <!-- Tape -->
+  <rect x="40" y="235" width="520" height="14" fill="#E8D29A" opacity="0.9" stroke="#B59A60" stroke-width="0.6"/>
+  <rect x="290" y="180" width="20" height="130" fill="#E8D29A" opacity="0.65"/>
+
+  <!-- Heavy stamp -->
+  <g transform="translate(430,275) rotate(-6)">
+    <rect width="110" height="34" fill="none" stroke="#C32D2D" stroke-width="2.5" rx="3"/>
+    <text x="55" y="22" font-family="-apple-system,Helvetica,Arial" font-size="13" font-weight="800" fill="#C32D2D" text-anchor="middle">HEAVY 2-PERSON</text>
+  </g>
+
+  <!-- Label -->
+  <g transform="translate(70,190)">
+    <rect width="180" height="100" fill="#FFF" stroke="#1A1A1A" stroke-width="1.5" rx="3"/>
+    <rect width="180" height="22" fill="#7B189F"/>
+    <text x="8" y="16" font-family="-apple-system,Helvetica,Arial" font-size="12" font-weight="700" fill="#FFF">LASTSCREW · HOSTED</text>
+    <text x="10" y="42" font-family="-apple-system,Helvetica,Arial" font-size="11" font-weight="700" fill="#1A1A1A">Farmhouse Dining Table</text>
+    <rect x="10" y="50" width="160" height="3" fill="#9CA3AF"/>
+    <rect x="10" y="58" width="120" height="3" fill="#9CA3AF"/>
+    <rect x="10" y="66" width="100" height="3" fill="#9CA3AF"/>
+    <g fill="#1A1A1A">
+      <rect x="10" y="76" width="2" height="18"/>
+      <rect x="14" y="76" width="3" height="18"/>
+      <rect x="19" y="76" width="1" height="18"/>
+      <rect x="22" y="76" width="2" height="18"/>
+      <rect x="26" y="76" width="3" height="18"/>
+      <rect x="31" y="76" width="1" height="18"/>
+      <rect x="34" y="76" width="2" height="18"/>
+      <rect x="38" y="76" width="3" height="18"/>
+      <rect x="43" y="76" width="1" height="18"/>
+      <rect x="46" y="76" width="2" height="18"/>
+      <rect x="50" y="76" width="3" height="18"/>
+      <rect x="55" y="76" width="1" height="18"/>
+      <rect x="58" y="76" width="2" height="18"/>
+      <rect x="62" y="76" width="3" height="18"/>
+      <rect x="67" y="76" width="1" height="18"/>
+      <rect x="70" y="76" width="2" height="18"/>
+    </g>
+  </g>
+
+  <!-- QA pass badge -->
+  <g transform="translate(310,205)">
+    <circle r="26" fill="#0E9F6E"/>
+    <path d="M-11 0 L-3 9 L13 -9" stroke="#FFF" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- Caption -->
+  <text x="300" y="378" font-family="-apple-system,Helvetica,Arial" font-size="16" font-weight="600" fill="#1A1A1A" text-anchor="middle">Farmhouse Dining Table — boxed &amp; QA-verified</text>
+</svg>
