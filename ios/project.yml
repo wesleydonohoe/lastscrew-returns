@@ -8,9 +8,12 @@ options:
 settings:
   base:
     SWIFT_VERSION: "5.9"
-    DEVELOPMENT_TEAM: ""
+    # Upper Upland Ventures, Inc — wesley donohoe's Apple Developer team.
+    DEVELOPMENT_TEAM: "DD8M6P7DAQ"
     CODE_SIGN_STYLE: Automatic
     ENABLE_USER_SCRIPT_SANDBOXING: NO
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
 
 targets:
   Lastscrew:
@@ -22,7 +25,7 @@ targets:
     info:
       path: Sources/Lastscrew/Info.plist
       properties:
-        CFBundleDisplayName: Last Screw
+        CFBundleDisplayName: LastScrew
         UILaunchScreen:
           UIColorName: ""
         UIApplicationSceneManifest:
@@ -33,9 +36,13 @@ targets:
         NSPhotoLibraryAddUsageDescription: "Save a copy of your packaging photo for your records."
         ITSAppUsesNonExemptEncryption: false
         LSApplicationCategoryType: public.app-category.shopping
-        LASTSCREW_API_BASE: "http://127.0.0.1:8787"
+        # Default points at the Mac's LAN IP so a real device on the same Wi-Fi
+        # can reach the local wrangler dev server. Override in scheme env or
+        # at production time with your deployed Worker URL (https).
+        LASTSCREW_API_BASE: "http://192.168.98.142:8787"
         NSAppTransportSecurity:
           NSAllowsLocalNetworking: true
+          NSAllowsArbitraryLoadsInWebContent: false
           NSExceptionDomains:
             127.0.0.1:
               NSExceptionAllowsInsecureHTTPLoads: true
@@ -43,10 +50,17 @@ targets:
             localhost:
               NSExceptionAllowsInsecureHTTPLoads: true
               NSIncludesSubdomains: true
+            192.168.98.142:
+              NSExceptionAllowsInsecureHTTPLoads: true
+              NSIncludesSubdomains: true
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.lastscrew.app
+        PRODUCT_BUNDLE_IDENTIFIER: com.lastscrew.lastscrew
         TARGETED_DEVICE_FAMILY: "1"
         SUPPORTS_MACCATALYST: NO
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        ENABLE_BITCODE: NO
+        SWIFT_TREAT_WARNINGS_AS_ERRORS: NO
+        GCC_TREAT_WARNINGS_AS_ERRORS: NO
+        IPHONEOS_DEPLOYMENT_TARGET: "17.0"

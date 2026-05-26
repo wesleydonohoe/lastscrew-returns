@@ -1,13 +1,19 @@
-// Baseten vision client for packaging QA.
+// Baseten client for packaging QA.
 //
-// Hosts a vision model (e.g. Qwen2-VL, LLaVA-NeXT, or a fine-tuned packaging
-// classifier) on Baseten. https://docs.baseten.co/overview
+// We talk to a Baseten-hosted model via its OpenAI-compatible endpoint:
+//   POST https://model-<id>.api.baseten.co/environments/production/sync/v1/chat/completions
+// The "build your first model" Truss path
+// (https://docs.baseten.co/development/model/build-your-first-model) compiles
+// a HuggingFace text model into this endpoint with no Python code.
 //
-// We POST to the deployed model's /predict endpoint with a base64 image and a
-// prompt. The model returns JSON we trust as the QA verdict.
+// For vision QA we ideally want a multimodal model (Qwen2-VL, LLaVA-NeXT, …),
+// which needs a Python-based Truss. The endpoint shape is the same; the
+// payload just adds image content blocks. If the deployed model is text-only,
+// we use the user-provided photo description as the input and the model
+// reasons over that.
 //
-// If BASETEN_API_KEY or BASETEN_MODEL_ID is missing, we fall back to a
-// deterministic mock so the demo runs cold.
+// If BASETEN_API_KEY / BASETEN_MODEL_ID is missing, we return a deterministic
+// mock so the demo runs cold.
 
 export interface PackagingChecklistItem {
   label: string;
@@ -25,17 +31,18 @@ export interface PackagingQAResult {
 }
 
 const QA_PROMPT = `You are a packaging quality inspector for Wayfair's "Last Screw" return program.
-The user has kept an assembled furniture item and is now repackaging it as a micro-warehouse host.
+The user has dismantled a furniture item and repackaged it into a shippable box — the same job a Wayfair warehouse worker would do on intake. You are deciding whether the package is ready to ship to a buyer (or back to the FC) without further handling.
 
-Look at the photo and score whether the packaging is shippable. Score each item:
-1. Item fully wrapped (blanket / shrink / original wrap)
-2. Corners and edges padded
-3. Original box OR comparable rigid container
-4. Box closed and taped
-5. Shipping label area clear and dry
-6. No visible damage, stains, or wet spots
+Score whether the packaging is shippable. Check each item:
+1. Item fully dismantled into shippable parts (no oversized assemblies left)
+2. Each part wrapped (blanket / shrink / original wrap)
+3. Corners and edges padded
+4. Original box OR comparable rigid container
+5. Box closed and taped on both top and bottom seams
+6. Shipping label area clear and dry
+7. No visible damage, stains, or wet spots
 
-Return STRICT JSON only:
+Return STRICT JSON only — no prose, no backticks — with this exact shape:
 {
   "verdict": "pass" | "needs_work" | "fail",
   "score": <0..1>,
@@ -44,46 +51,75 @@ Return STRICT JSON only:
   "bonusMultiplier": <0..1.2>
 }`;
 
+const DEFAULT_MODEL_NAME = "lastscrew-packaging-vision";
+
+export type BasetenEndpointKind = "predict" | "openai";
+
 export async function runPackagingQA(args: {
   imageBase64?: string;
   imageUrl?: string;
   photoDescription?: string;
   baseteenApiKey?: string;
   basetenModelId?: string;
+  basetenModelName?: string;
+  /** "predict" = Python Truss /production/predict. "openai" = trt_llm config-only. Default predict. */
+  basetenEndpoint?: BasetenEndpointKind;
 }): Promise<PackagingQAResult> {
   const { imageBase64, imageUrl, photoDescription } = args;
   const apiKey = args.baseteenApiKey;
   const modelId = args.basetenModelId;
+  const modelName = args.basetenModelName ?? DEFAULT_MODEL_NAME;
+  const endpointKind: BasetenEndpointKind = args.basetenEndpoint ?? "predict";
 
   if (!apiKey || !modelId) {
     return mockQA(photoDescription ?? "(no description)");
   }
 
-  // Baseten model deployments expose POST https://model-<id>.api.baseten.co/production/predict
-  // Different models accept different payloads — this targets vision LLMs that
-  // follow an OpenAI-style chat completions schema.
-  const url = `https://model-${modelId}.api.baseten.co/production/predict`;
+  // Endpoint depends on how the model was deployed:
+  //   • Python Truss with model.py  → /production/predict           (used by lastscrew-packaging-vision)
+  //   • trt_llm config-only         → /environments/production/sync/v1/chat/completions
+  const url =
+    endpointKind === "openai"
+      ? `https://model-${modelId}.api.baseten.co/environments/production/sync/v1/chat/completions`
+      : `https://model-${modelId}.api.baseten.co/production/predict`;
 
-  const messages: unknown[] = [
-    {
-      role: "user",
-      content: [
-        { type: "text", text: QA_PROMPT },
-        ...(imageBase64
-          ? [
-              {
-                type: "image_url",
-                image_url: { url: `data:image/jpeg;base64,${imageBase64}` },
-              },
-            ]
-          : []),
-        ...(imageUrl ? [{ type: "image_url", image_url: { url: imageUrl } }] : []),
-        ...(photoDescription
-          ? [{ type: "text", text: `User-provided photo description: ${photoDescription}` }]
-          : []),
-      ],
-    },
+  const userContent: unknown[] = [];
+  // Vision content (only meaningful if the deployed model is multimodal).
+  if (imageBase64) {
+    userContent.push({
+      type: "image_url",
+      image_url: { url: `data:image/jpeg;base64,${imageBase64}` },
+    });
+  }
+  if (imageUrl) {
+    userContent.push({ type: "image_url", image_url: { url: imageUrl } });
+  }
+  if (photoDescription) {
+    userContent.push({
+      type: "text",
+      text: `Photo description: ${photoDescription}`,
+    });
+  }
+  // If only an image was provided and the model happens to be text-only,
+  // give it a deterministic stub description so it still produces useful JSON.
+  if (userContent.length === 0) {
+    userContent.push({
+      type: "text",
+      text: "No description supplied — assume an average attempt at packaging.",
+    });
+  }
+
+  const messages = [
+    { role: "system", content: QA_PROMPT },
+    { role: "user", content: userContent },
   ];
+
+  // The OpenAI-compatible endpoint requires a `model` field; the Python
+  // Truss endpoint ignores it but accepting both keeps the body shape stable.
+  const body =
+    endpointKind === "openai"
+      ? { model: modelName, messages, max_tokens: 600, temperature: 0.1 }
+      : { messages, max_tokens: 600, temperature: 0.1 };
 
   const response = await fetch(url, {
     method: "POST",
@@ -91,16 +127,14 @@ export async function runPackagingQA(args: {
       Authorization: `Api-Key ${apiKey}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      messages,
-      max_tokens: 600,
-      temperature: 0.1,
-    }),
+    body: JSON.stringify(body),
   });
 
   if (!response.ok) {
-    const body = await response.text().catch(() => "");
-    throw new Error(`Baseten returned ${response.status}: ${body.slice(0, 200)}`);
+    const text = await response.text().catch(() => "");
+    throw new Error(
+      `Baseten returned ${response.status}: ${text.slice(0, 200)}`,
+    );
   }
 
   const payload = (await response.json()) as {
@@ -131,7 +165,6 @@ function parseQA(raw: string): Omit<PackagingQAResult, "source"> {
 }
 
 function mockQA(description: string): PackagingQAResult {
-  // Bias the verdict on whether the description sounds positive — keeps demo deterministic.
   const positive = /(wrapped|taped|padded|box|label|dry|clean)/i.test(description);
   const negative = /(torn|wet|damage|stain|open|missing|no box)/i.test(description);
 

@@ -38,6 +38,10 @@ final class APIClient {
         try await get("/api/lastscrew/items/\(orderId)")
     }
 
+    func fetchOrders() async throws -> OrdersResponse {
+        try await get("/api/lastscrew/items")
+    }
+
     func requestOffer(orderId: String, zip: String) async throws -> HostOffer {
         try await post("/api/lastscrew/offer", body: ["orderId": orderId, "zip": zip])
     }

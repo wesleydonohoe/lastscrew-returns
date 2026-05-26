@@ -2,7 +2,7 @@ import SwiftUI
 
 struct ManageItemView: View {
     @EnvironmentObject var router: AppRouter
-    @State private var item: ItemDetails = .demo
+    let item: ItemDetails
     @State private var loadFailed = false
 
     var body: some View {
@@ -26,7 +26,6 @@ struct ManageItemView: View {
                     .foregroundStyle(Theme.text)
             }
         }
-        .task { await loadItem() }
     }
 
     private var header: some View {
@@ -40,7 +39,7 @@ struct ManageItemView: View {
 
     private var itemCard: some View {
         HStack(alignment: .top, spacing: 14) {
-            Image("MattressHero")
+            Image(item.imageAsset)
                 .resizable()
                 .scaledToFill()
                 .frame(width: 110, height: 110)
@@ -135,16 +134,8 @@ struct ManageItemView: View {
         .buttonStyle(.plain)
     }
 
-    private func loadItem() async {
-        do {
-            let live = try await APIClient.shared.fetchItem(orderId: ItemDetails.demo.orderId)
-            self.item = live
-        } catch {
-            self.loadFailed = true   // keep the .demo fallback so UI never blanks
-        }
-    }
 }
 
 #Preview {
-    NavigationStack { ManageItemView().environmentObject(AppRouter()) }
+    NavigationStack { ManageItemView(item: .demo).environmentObject(AppRouter()) }
 }

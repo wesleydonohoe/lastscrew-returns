@@ -6,12 +6,35 @@ export interface ToolDefinition {
 }
 
 // Mock data store — in a real build this is Wayfair order/inventory/CRM data.
-// Keyed by orderId so the iOS demo can drive the whole pricing flow off a single ID.
+// Five items with deliberately varied retail / weight / packaging difficulty so
+// the pricing agent's offers diverge in obvious ways across item types.
 const MOCK_ITEMS: Record<string, ItemDetails> = {
+  // Wes's actual orders, lifted from his Wayfair "My Orders" page.
+  "WF-ORDER-8820": {
+    orderId: "WF-ORDER-8820",
+    sku: "WF-HARLOW-TWN-WHT",
+    name: "Harlow Solid Wood Platform Bed",
+    brand: "Red Barrel Studio®",
+    imageAsset: "HarlowBed",
+    retailPriceUsd: 329,
+    customerPaidUsd: 289,
+    assemblyTimeMinutes: 68,
+    packagingDifficulty: "medium",
+    dimensions: 'Twin 41"W x 78"L x 14"H',
+    weightLbs: 78,
+    category: "bedroom",
+    deliveredAt: "2026-05-26",
+    returnReason: "doesnt_fit",
+    status: "delivered",
+    lastScrewEligible: true,
+    estPayoutRange: { low: 95, high: 145 },
+  },
   "WF-ORDER-8821": {
     orderId: "WF-ORDER-8821",
     sku: "WF-SLP-12MED-Q",
-    name: 'Sleep by Wayfair™ 12" Medium Memory Foam Mattress + Platform Bed',
+    name: 'Sleep by Wayfair™ 12" Memory Foam Mattress + Platform Bed',
+    brand: "Sleep by Wayfair™",
+    imageAsset: "MattressHero",
     retailPriceUsd: 549,
     customerPaidUsd: 489,
     assemblyTimeMinutes: 92,
@@ -21,13 +44,120 @@ const MOCK_ITEMS: Record<string, ItemDetails> = {
     category: "bedroom",
     deliveredAt: "2026-05-17",
     returnReason: "doesnt_fit",
+    status: "delivered",
+    lastScrewEligible: true,
+    estPayoutRange: { low: 120, high: 175 },
+  },
+  "WF-ORDER-8826": {
+    orderId: "WF-ORDER-8826",
+    sku: "WF-LUCERA-TWN-WHT",
+    name: "Lucera Mid-Century Bobbin Bed",
+    brand: "August Grove®",
+    imageAsset: "LuceraBed",
+    retailPriceUsd: 419,
+    customerPaidUsd: 369,
+    assemblyTimeMinutes: 84,
+    packagingDifficulty: "hard",
+    dimensions: 'Twin 42"W x 80"L x 36"H',
+    weightLbs: 96,
+    category: "bedroom",
+    deliveredAt: "2026-05-23",
+    returnReason: "doesnt_fit",
+    status: "delivered",
+    lastScrewEligible: true,
+    estPayoutRange: { low: 130, high: 195 },
+  },
+  "WF-ORDER-8822": {
+    orderId: "WF-ORDER-8822",
+    sku: "WF-SOFA-3SEAT-VLV",
+    name: "Velvet 3-Seat Sectional Sofa",
+    brand: "Wade Logan®",
+    imageAsset: "VelvetSofa",
+    retailPriceUsd: 1299,
+    customerPaidUsd: 1099,
+    assemblyTimeMinutes: 75,
+    packagingDifficulty: "hard",
+    dimensions: '112"W x 70"D x 34"H',
+    weightLbs: 218,
+    category: "living",
+    deliveredAt: "2026-05-19",
+    returnReason: "color_mismatch",
+    status: "delivered",
+    lastScrewEligible: true,
+    estPayoutRange: { low: 180, high: 245 },
+  },
+  "WF-ORDER-8823": {
+    orderId: "WF-ORDER-8823",
+    sku: "WF-DESK-MCM-WAL",
+    name: "Mid-Century Walnut Writing Desk",
+    brand: "George Oliver®",
+    imageAsset: "WalnutDesk",
+    retailPriceUsd: 349,
+    customerPaidUsd: 299,
+    assemblyTimeMinutes: 38,
+    packagingDifficulty: "easy",
+    dimensions: '48"W x 24"D x 30"H',
+    weightLbs: 64,
+    category: "office",
+    deliveredAt: "2026-05-21",
+    returnReason: "doesnt_fit",
+    status: "delivered",
+    lastScrewEligible: false,
+    ineligibleReason: "Final-sale item — Wayfair return policy excludes this SKU from Last Screw.",
+  },
+  "WF-ORDER-8824": {
+    orderId: "WF-ORDER-8824",
+    sku: "WF-DINING-6P-OAK",
+    name: "Farmhouse Oak Dining Set (table + 6 chairs)",
+    brand: "Three Posts™",
+    imageAsset: "FarmhouseDining",
+    retailPriceUsd: 899,
+    customerPaidUsd: 779,
+    assemblyTimeMinutes: 124,
+    packagingDifficulty: "hard",
+    dimensions: 'Table 72"W x 40"D x 30"H',
+    weightLbs: 196,
+    category: "dining",
+    deliveredAt: "2026-05-18",
+    returnReason: "changed_mind",
+    status: "delivered",
+    lastScrewEligible: false,
+    ineligibleReason: "Open damage claim on this order — resolve with Wayfair Support first.",
+  },
+  "WF-ORDER-8825": {
+    orderId: "WF-ORDER-8825",
+    sku: "WF-LAMP-ARC-BRS",
+    name: 'Brass Arc Floor Lamp 68" Adjustable',
+    brand: "Mercer41™",
+    imageAsset: "ArcFloorLamp",
+    retailPriceUsd: 189,
+    customerPaidUsd: 159,
+    assemblyTimeMinutes: 14,
+    packagingDifficulty: "easy",
+    dimensions: '68"H x 36" arc',
+    weightLbs: 22,
+    category: "lighting",
+    deliveredAt: "2026-05-22",
+    returnReason: "wrong_color",
+    status: "delivered",
+    lastScrewEligible: false,
+    ineligibleReason: "Below the $200 Last Screw payout floor — standard return is faster.",
   },
 };
+
+export function listMockItems(): ItemDetails[] {
+  // Sort newest delivery first.
+  return Object.values(MOCK_ITEMS).sort((a, b) =>
+    b.deliveredAt.localeCompare(a.deliveredAt),
+  );
+}
 
 export interface ItemDetails {
   orderId: string;
   sku: string;
   name: string;
+  brand: string;
+  imageAsset: string;
   retailPriceUsd: number;
   customerPaidUsd: number;
   assemblyTimeMinutes: number;
@@ -37,6 +167,13 @@ export interface ItemDetails {
   category: string;
   deliveredAt: string;
   returnReason: string;
+  status: "delivered" | "in_transit" | "returned";
+  /** Whether this item can use the Last Screw host program. */
+  lastScrewEligible: boolean;
+  /** When ineligible, why — shown in the UI. */
+  ineligibleReason?: string;
+  /** Rough payout estimate ($X-$Y) shown on the eligible card before full agent run. */
+  estPayoutRange?: { low: number; high: number };
 }
 
 export function getMockItem(orderId: string): ItemDetails | undefined {

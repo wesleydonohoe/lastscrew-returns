@@ -5,12 +5,17 @@ struct PackagingCameraView: View {
     @EnvironmentObject var router: AppRouter
     let item: ItemDetails
     let offer: HostOffer
+    /// Optional retake tips surfaced from the previous QA verdict.
+    var retakeTips: [String] = []
 
     @StateObject private var camera = CameraController()
     @StateObject private var vm = PackagingViewModel()
     @State private var pickerItem: PhotosPickerItem?
     @State private var fallbackImage: UIImage?
     @State private var isCapturing = false
+    @State private var showCoach = true
+    @State private var spinAngle: Double = 0
+    @State private var visionAgentStatus: String = "detecting box edges…"
 
     var body: some View {
         ZStack {
@@ -28,9 +33,20 @@ struct PackagingCameraView: View {
 
             VStack {
                 topBar
+                if !retakeTips.isEmpty && showCoach {
+                    coachCard
+                        .padding(.horizontal, 16)
+                        .transition(.move(edge: .top).combined(with: .opacity))
+                }
                 Spacer()
                 framingGuide
                 Spacer()
+                if isCapturing || vm.isVerifying {
+                    visionAgentPanel
+                        .padding(.horizontal, 20)
+                        .padding(.bottom, 8)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                }
                 shutterRow
             }
         }
@@ -110,6 +126,86 @@ struct PackagingCameraView: View {
         .padding(.bottom, 36)
     }
 
+    // MARK: - Coaching overlay (visible on retake with tips)
+
+    private var coachCard: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 6) {
+                Image(systemName: "wand.and.stars")
+                    .foregroundColor(Theme.molten)
+                Text("PACKAGING COACH")
+                    .font(.caption2.weight(.heavy)).tracking(1.5)
+                    .foregroundColor(Theme.molten)
+                Spacer()
+                Button { withAnimation { showCoach = false } } label: {
+                    Image(systemName: "xmark")
+                        .font(.caption2.weight(.heavy))
+                        .foregroundColor(Theme.chrome)
+                        .padding(4)
+                        .background(Color.black.opacity(0.3))
+                        .clipShape(Circle())
+                }
+            }
+            ForEach(Array(retakeTips.prefix(3).enumerated()), id: \.offset) { _, tip in
+                HStack(alignment: .top, spacing: 6) {
+                    Image(systemName: "arrow.right.circle.fill")
+                        .font(.caption)
+                        .foregroundColor(Theme.molten)
+                    Text(tip)
+                        .font(.caption)
+                        .foregroundColor(Theme.chrome)
+                }
+            }
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Theme.void.opacity(0.75))
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .stroke(Theme.molten.opacity(0.45), lineWidth: 1)
+        )
+    }
+
+    // MARK: - Vision agent activity panel (visible while QA is running)
+
+    private var visionAgentPanel: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 8) {
+                Circle()
+                    .trim(from: 0, to: 0.75)
+                    .stroke(Theme.molten, style: StrokeStyle(lineWidth: 2, lineCap: .round))
+                    .frame(width: 12, height: 12)
+                    .rotationEffect(.degrees(spinAngle))
+                    .onAppear {
+                        withAnimation(.linear(duration: 0.8).repeatForever(autoreverses: false)) {
+                            spinAngle = 360
+                        }
+                    }
+                Text("VISION AGENT")
+                    .font(.caption.weight(.heavy)).tracking(2)
+                    .foregroundColor(Theme.molten)
+                Spacer()
+                Text("baseten · qwen2-vl")
+                    .font(Theme.monoFont)
+                    .foregroundColor(Theme.chromeFaint)
+            }
+            Text(visionAgentStatus)
+                .font(Theme.monoFont)
+                .foregroundColor(Theme.chrome)
+                .id(visionAgentStatus)
+                .transition(.opacity)
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Theme.void.opacity(0.8))
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .stroke(Theme.molten.opacity(0.45), lineWidth: 1)
+        )
+    }
+
     private var fallbackPicker: some View {
         VStack(spacing: 20) {
             Image(systemName: "camera.slash.fill").font(.system(size: 44)).foregroundColor(Theme.chrome)
@@ -134,12 +230,35 @@ struct PackagingCameraView: View {
         defer { isCapturing = false }
         do {
             let img = try await camera.capture()
+            // Surface the model's working steps so the user sees the agent moving.
+            let cycleTask = Task { await cycleVisionStatus() }
             await vm.verify(orderId: item.orderId, image: img)
+            cycleTask.cancel()
             if let res = vm.result {
                 router.push(.packagingResult(item, offer, res))
             }
         } catch {
             vm.errorMessage = error.localizedDescription
+        }
+    }
+
+    private func cycleVisionStatus() async {
+        let phases = [
+            "uploading photo to baseten…",
+            "detecting box edges…",
+            "checking corner padding…",
+            "inspecting tape seams…",
+            "reading label area…",
+            "scoring shippability…",
+        ]
+        for phase in phases {
+            await MainActor.run { withAnimation { visionAgentStatus = phase } }
+            try? await Task.sleep(nanoseconds: 850_000_000)
+            if Task.isCancelled { return }
+        }
+        // If verification is still running past the last phase, hold the final.
+        while !Task.isCancelled {
+            try? await Task.sleep(nanoseconds: 800_000_000)
         }
     }
 

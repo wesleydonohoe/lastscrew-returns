@@ -7,7 +7,7 @@ import {
   listRecentRuns,
   saveAgentConfig,
 } from "./agent/store";
-import { TOOL_REGISTRY, getMockItem } from "./agent/tools";
+import { TOOL_REGISTRY, getMockItem, listMockItems } from "./agent/tools";
 import { computeHostOffer } from "./lastscrew/offer";
 import { runPackagingQA } from "./baseten/client";
 import type { AgentConfig, Env } from "./types";
@@ -26,6 +26,13 @@ app.get("/api/health", (c) => {
 });
 
 // ── lastscrew product endpoints ───────────────────────────────────────────────
+
+app.get("/api/lastscrew/items", (c) => {
+  return c.json({
+    user: { firstName: "Wes", rewardsBalance: 95.04 },
+    items: listMockItems(),
+  });
+});
 
 app.get("/api/lastscrew/items/:orderId", (c) => {
   const item = getMockItem(c.req.param("orderId"));
@@ -64,6 +71,8 @@ app.post("/api/lastscrew/verify", async (c) => {
       photoDescription: body.photoDescription,
       baseteenApiKey: c.env.BASETEN_API_KEY,
       basetenModelId: c.env.BASETEN_MODEL_ID,
+      basetenModelName: c.env.BASETEN_MODEL_NAME,
+      basetenEndpoint: (c.env.BASETEN_ENDPOINT as "predict" | "openai" | undefined) ?? "predict",
     });
     return c.json({
       orderId: body.orderId ?? null,
@@ -96,6 +105,8 @@ app.post("/api/lastscrew/demo", async (c) => {
         body.photoDescription ?? "box closed and taped, corners padded, label visible",
       baseteenApiKey: c.env.BASETEN_API_KEY,
       basetenModelId: c.env.BASETEN_MODEL_ID,
+      basetenModelName: c.env.BASETEN_MODEL_NAME,
+      basetenEndpoint: (c.env.BASETEN_ENDPOINT as "predict" | "openai" | undefined) ?? "predict",
     }),
   ]);
 
