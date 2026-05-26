@@ -15,7 +15,7 @@ struct PackagingCameraView: View {
     @State private var isCapturing = false
     @State private var showCoach = true
     @State private var spinAngle: Double = 0
-    @State private var visionAgentStatus: String = "detecting box edges…"
+    @State private var visionAgentStatus: String = "preparing…"
 
     var body: some View {
         ZStack {
@@ -230,10 +230,13 @@ struct PackagingCameraView: View {
         defer { isCapturing = false }
         do {
             let img = try await camera.capture()
-            // Surface the model's working steps so the user sees the agent moving.
-            let cycleTask = Task { await cycleVisionStatus() }
-            await vm.verify(orderId: item.orderId, image: img)
-            cycleTask.cancel()
+            // Run the phase animation AND the verify call in parallel, and
+            // wait for BOTH before navigating. This guarantees the user sees
+            // the full agent stream even when the mock returns instantly.
+            async let cycleDone: Void = cycleVisionStatus()
+            async let verifyDone: Void = vm.verify(orderId: item.orderId, image: img)
+            _ = await cycleDone
+            _ = await verifyDone
             if let res = vm.result {
                 router.push(.packagingResult(item, offer, res))
             }
@@ -252,13 +255,12 @@ struct PackagingCameraView: View {
             "scoring shippability…",
         ]
         for phase in phases {
-            await MainActor.run { withAnimation { visionAgentStatus = phase } }
-            try? await Task.sleep(nanoseconds: 850_000_000)
-            if Task.isCancelled { return }
-        }
-        // If verification is still running past the last phase, hold the final.
-        while !Task.isCancelled {
-            try? await Task.sleep(nanoseconds: 800_000_000)
+            await MainActor.run {
+                withAnimation(.easeInOut(duration: 0.25)) {
+                    visionAgentStatus = phase
+                }
+            }
+            try? await Task.sleep(nanoseconds: 750_000_000)
         }
     }
 
