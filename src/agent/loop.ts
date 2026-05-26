@@ -7,29 +7,28 @@
 
 import type OpenAI from "openai";
 import type { ChatCompletionMessageParam } from "openai/resources/chat/completions";
-import { createSubconsciousClient, SUBCONSCIOUS_MODEL } from "../subconscious/client";
+import { createSubconscious, SUBCONSCIOUS_MODEL } from "../subconscious/client";
 import { buildSystemPrompt } from "./prompt";
 import { executeTool, getEnabledTools, type ToolDefinition } from "./tools";
 
-const RESPONSE_FORMAT: OpenAI.Chat.Completions.ChatCompletionCreateParams["response_format"] =
-  {
-    type: "json_schema",
-    json_schema: {
-      name: "agent_response",
-      strict: true,
-      schema: {
-        type: "object",
-        properties: {
-          action: { type: "string", enum: ["tool_call", "final_answer"] },
-          tool: { type: "string" },
-          arguments: { type: "object" },
-          content: { type: "string" },
-        },
-        required: ["action"],
-        additionalProperties: false,
+const RESPONSE_FORMAT = {
+  type: "json_schema",
+  json_schema: {
+    name: "agent_response",
+    strict: true,
+    schema: {
+      type: "object",
+      properties: {
+        action: { type: "string", enum: ["tool_call", "final_answer"] },
+        tool: { type: "string" },
+        arguments: { type: "object" },
+        content: { type: "string" },
       },
+      required: ["action"],
+      additionalProperties: false,
     },
-  };
+  },
+} as const satisfies OpenAI.Chat.Completions.ChatCompletionCreateParams["response_format"];
 
 interface AgentResponse {
   action: "tool_call" | "final_answer";
@@ -64,7 +63,10 @@ export interface RunLoopResult {
 }
 
 export async function runAgentLoop(input: RunLoopInput): Promise<RunLoopResult> {
-  const client = createSubconsciousClient(input.apiKey);
+  const subconscious = createSubconscious(input.apiKey, {
+    enableThinking: input.enableThinking ?? false,
+  });
+  const chat = subconscious.chat(SUBCONSCIOUS_MODEL);
   const tools = getEnabledTools(input.enabledTools);
   const maxSteps = input.maxSteps ?? 8;
 
@@ -78,14 +80,11 @@ export async function runAgentLoop(input: RunLoopInput): Promise<RunLoopResult> 
   const toolCalls: RunLoopResult["toolCalls"] = [];
 
   for (let step = 0; step < maxSteps; step++) {
-    const response = await client.chat.completions.create({
-      model: SUBCONSCIOUS_MODEL,
+    const response = await chat.completions.create({
       messages,
       max_tokens: input.maxTokens ?? 1000,
       temperature: input.temperature ?? 0.7,
       response_format: RESPONSE_FORMAT,
-      // @ts-expect-error Subconscious chat_template_kwargs extension
-      chat_template_kwargs: { enable_thinking: input.enableThinking ?? false },
     });
 
     const raw = response.choices[0]?.message?.content ?? "";

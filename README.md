@@ -204,7 +204,18 @@ cp .dev.vars.example .dev.vars
 # SUBCONSCIOUS_API_KEY=sky_...  (from subconscious.dev/platform)
 ```
 
-Model: `subconscious/tim-qwen3.6-27b` via `src/subconscious/client.ts`. The LLM returns structured JSON each turn — either call a tool or give a final answer.
+Model: `subconscious/tim-qwen3.6-27b` via `src/subconscious/client.ts`:
+
+```typescript
+const subconscious = createSubconscious(apiKey, { enableThinking: false });
+const response = await subconscious.chat(SUBCONSCIOUS_MODEL).completions.create({
+  messages: [{ role: "user", content: "Hello" }],
+});
+```
+
+Use **`subconscious.chat(model)`** → `/v1/chat/completions`. Do not use `/v1/responses` (unsupported).
+
+Subconscious defaults **thinking ON**. This starter disables it automatically via a custom `fetch` on `createOpenAI` that merges `chat_template_kwargs: { enable_thinking: false }` into every chat request body. Set `enableThinking: true` on `createSubconscious()` to opt back in.
 
 ### 4. Tools — the hands
 
