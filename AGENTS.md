@@ -8,7 +8,16 @@ Hackathon starter: **Cloudflare Workers + Subconscious API** for Wayfair agent c
 2. **Supply chain** — shipments, suppliers, logistics
 3. **FinOps & customer service** — tickets, refunds, internal ops
 
-Participants pick a track, define agent behavior, add tools, and connect a trigger.
+## Anatomy of an agent
+
+Every agent is four parts: **trigger**, **harness**, **LLM**, **tools**.
+
+| Part | Role | In this starter |
+|------|------|-----------------|
+| **Trigger** | Wakes the agent | `src/index.ts` — webhook, cron, API, button |
+| **Harness** | Runs the ReAct loop | `src/agent/loop.ts` on a Cloudflare Worker |
+| **LLM** | Brain — reasons and decides | Subconscious API |
+| **Tools** | Hands — fetch data, take action | `src/agent/tools.ts` |
 
 ## Subconscious skill
 
@@ -21,15 +30,20 @@ Bundled at `.agents/skills/subconscious-dev/`.
 ## Flow
 
 ```
-Trigger → src/index.ts → src/agent/store.ts → src/agent/runner.ts → Subconscious API
-                                                              ↓
-                                                    src/agent/tools.ts
+Trigger → Harness (loop.ts) → LLM (Subconscious) → Tools (tools.ts)
 ```
+
+Same ReAct pattern as [hack-cli-starter](https://github.com/subconscious-systems/subconscious/tree/main/examples/hack-cli-starter).
+
+## Example
+
+Track 1 shopping assistant: `examples/shopping-assistant/` — run with `bash examples/shopping-assistant/run.sh`
 
 ## Edit these files
 
 | Goal | File |
 |------|------|
+| Agent loop | `src/agent/loop.ts` |
 | Default prompts / config | `src/types.ts` |
 | Add tools (main hackathon work) | `src/agent/tools.ts` |
 | New routes or triggers | `src/index.ts` |

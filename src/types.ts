@@ -43,7 +43,7 @@ export const DEFAULT_AGENT_CONFIG: AgentConfig = {
   enableThinking: false,
   maxTokens: 1000,
   temperature: 0.7,
-  enabledTools: ["get_time", "log_note"],
+  enabledTools: ["search_catalog", "log_note", "get_time"],
   cronInstructions:
     "This is a scheduled check-in. Review the latest notes and suggest the top priority for the team.",
 };

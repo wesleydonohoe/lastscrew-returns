@@ -2,7 +2,33 @@
 
 Build an AI agent on **Cloudflare Workers** powered by the [Subconscious API](https://docs.subconscious.dev).
 
-This repo gives you a working agent, a dashboard, and four ways to trigger it — so you can focus on the problem, not the plumbing.
+This repo gives you all four pieces wired together — so you can focus on the problem, not the plumbing.
+
+---
+
+## Anatomy of an agent
+
+Every agent is four parts:
+
+| Part | Role | In this starter |
+|------|------|-----------------|
+| **Trigger** | Wakes the agent up | Webhook, cron, API call, or dashboard button |
+| **Harness** | Runs the loop — receives input, calls the LLM, executes tools, returns output | Cloudflare Worker (`src/agent/loop.ts`) |
+| **LLM** | The brain — reasons and decides what to do next | [Subconscious API](https://docs.subconscious.dev) |
+| **Tools** | The hands — fetch data, search catalogs, call APIs | `src/agent/tools.ts` (you add these) |
+
+```
+  Trigger          Harness (Worker)              LLM              Tools
+  ───────          ────────────────              ───              ─────
+  webhook    ──→   receive event
+  cron       ──→   build prompt           ──→   Subconscious  ←──  search_catalog
+  API/button ──→   run ReAct loop         ←──   "call tool X" ──→  log_note
+                   return answer
+```
+
+**What is a Cloudflare Worker?** It's where the **harness** runs — serverless TypeScript on Cloudflare's network. No servers to provision. You edit prompts and tools, run `npm run dev`, deploy with one command.
+
+You don't need prior Cloudflare experience to hack on this repo.
 
 ---
 
@@ -87,28 +113,75 @@ npx wrangler secret put SUBCONSCIOUS_API_KEY
 
 ## How it works
 
-```
-Trigger          →  Worker routes  →  Agent (Subconscious)  →  Your tools
-─────────────────────────────────────────────────────────────────────────────
-Button / API        src/index.ts       reasoning + tool calls     src/agent/tools.ts
-Webhook
-Cron (hourly)
+Same **ReAct loop** as [hack-cli-starter](https://github.com/subconscious-systems/subconscious/tree/main/examples/hack-cli-starter): the harness asks the LLM what to do, runs tools when asked, and loops until done.
+
+| Part | What happens | Where in code |
+|------|----------------|---------------|
+| **Trigger** | Something fires the agent | `src/index.ts` — routes, cron, webhooks |
+| **Harness** | Manages the loop, config, run history | `src/agent/loop.ts`, `src/agent/store.ts` |
+| **LLM** | Reasons and returns `tool_call` or `final_answer` | `src/subconscious/client.ts` → Subconscious |
+| **Tools** | Execute locally when the LLM asks | `src/agent/tools.ts` |
+
+---
+
+## Example: Shopping assistant (Track 1)
+
+Ready-made example for the consumer shopping track:
+
+```bash
+npm run dev
+
+# In another terminal:
+bash examples/shopping-assistant/run.sh
 ```
 
-| Piece | What it does |
-|-------|----------------|
-| **Agent logic** | System prompt, instructions, and enabled tools — edit in the dashboard or via API |
-| **Subconscious** | Handles reasoning; calls your tools when needed |
-| **Tools** | Functions your agent can invoke (fetch data, log notes, call APIs) — you implement these |
-| **KV storage** | Persists config and run history between triggers |
+See [examples/shopping-assistant/README.md](./examples/shopping-assistant/README.md) for the full walkthrough.
+
+**Want a terminal REPL first?** Prototype locally with [hack-cli-starter](https://github.com/subconscious-systems/subconscious/tree/main/examples/hack-cli-starter) — then port your tools and prompts here for webhooks, cron, and deployment.
+
+```bash
+git clone https://github.com/subconscious-systems/subconscious
+cd subconscious/examples/hack-cli-starter
+npm install && npm run build && npm link
+export SUBCONSCIOUS_API_KEY=your_key
+sub
+```
+
+| Starter | Best for |
+|---------|----------|
+| **This repo** (Workers) | Triggers, webhooks, cron, dashboard, deploy to edge |
+| **[hack-cli-starter](https://github.com/subconscious-systems/subconscious/tree/main/examples/hack-cli-starter)** | Fast local iteration, terminal chat, MCP tools |
 
 ---
 
 ## Build your agent
 
-### 1. Set the behavior
+Work through the four parts:
 
-Use the dashboard at `/` or update config via API:
+### 1. Trigger — when does it run?
+
+| Trigger | When to use | How |
+|---------|-------------|-----|
+| **Button** | Demos, manual testing | Dashboard → Run now |
+| **API** | User-facing apps, internal tools | `POST /api/run` |
+| **Webhook** | External events (tickets, shipments, orders) | `POST /api/webhook` |
+| **Cron** | Scheduled digests, monitoring | Edit `[triggers].crons` in `wrangler.toml` |
+
+```bash
+# Run on demand
+curl -X POST http://localhost:8787/api/run \
+  -H "Content-Type: application/json" \
+  -d '{"instructions": "A customer wants a mid-century desk under $500."}'
+
+# React to an event
+curl -X POST http://localhost:8787/api/webhook \
+  -H "Content-Type: application/json" \
+  -d '{"event": "shipment.delayed", "payload": { "orderId": "WF-9912" }}'
+```
+
+### 2. Harness — configure the loop
+
+Set the system prompt, default instructions, and enabled tools via the dashboard at `/` or API:
 
 ```bash
 curl -X PUT http://localhost:8787/api/agent/config \
@@ -116,15 +189,26 @@ curl -X PUT http://localhost:8787/api/agent/config \
   -d '{
     "systemPrompt": "You are a Wayfair shopping assistant.",
     "instructions": "Help the user find furniture that fits their room.",
-    "enabledTools": ["get_time", "log_note"]
+    "enabledTools": ["search_catalog", "log_note"]
   }'
 ```
 
-Defaults live in `src/types.ts` if you prefer code over the dashboard.
+The harness (ReAct loop) lives in `src/agent/loop.ts`. Defaults are in `src/types.ts`.
 
-### 2. Add a tool
+### 3. LLM — the brain
 
-Tools are how your agent takes action. Edit `src/agent/tools.ts`:
+Point the harness at Subconscious with your API key:
+
+```bash
+cp .dev.vars.example .dev.vars
+# SUBCONSCIOUS_API_KEY=sky_...  (from subconscious.dev/platform)
+```
+
+Model: `subconscious/tim-qwen3.6-27b` via `src/subconscious/client.ts`. The LLM returns structured JSON each turn — either call a tool or give a final answer.
+
+### 4. Tools — the hands
+
+Edit `src/agent/tools.ts` — copy `search_catalog` as a template:
 
 ```typescript
 search_catalog: {
@@ -139,43 +223,14 @@ search_catalog: {
     required: ["query"],
   },
   execute: async (args) => {
-    // Call your data source, mock API, or KV lookup
-    return { results: [{ name: "Sofa", sku: "WF-123" }] };
+    return { results: [{ name: "Sofa", sku: "WF-123", price: 899 }] };
   },
 },
 ```
 
-Enable it in the dashboard tool picker or add it to `enabledTools` in config.
+Enable tools in the dashboard or add them to `enabledTools` in config.
 
-### 3. Wire up a trigger
-
-| Trigger | When to use | How |
-|---------|-------------|-----|
-| **Button** | Demos, manual testing | Dashboard → Run now |
-| **API** | User-facing apps, internal tools | `POST /api/run` |
-| **Webhook** | External events (tickets, shipments, orders) | `POST /api/webhook` |
-| **Cron** | Scheduled digests, monitoring | Edit `[triggers].crons` in `wrangler.toml` |
-
-**Run on demand:**
-
-```bash
-curl -X POST http://localhost:8787/api/run \
-  -H "Content-Type: application/json" \
-  -d '{"instructions": "A customer wants a mid-century desk under $500. What should I recommend?"}'
-```
-
-**React to an event:**
-
-```bash
-curl -X POST http://localhost:8787/api/webhook \
-  -H "Content-Type: application/json" \
-  -d '{
-    "event": "shipment.delayed",
-    "payload": { "orderId": "WF-9912", "delayDays": 3 }
-  }'
-```
-
-Set `WEBHOOK_SECRET` in `.dev.vars` to require an `x-webhook-secret` header in production.
+Set `WEBHOOK_SECRET` in `.dev.vars` to require an `x-webhook-secret` header on webhooks in production.
 
 ---
 
@@ -196,12 +251,13 @@ Set `WEBHOOK_SECRET` in `.dev.vars` to require an `x-webhook-secret` header in p
 ## Project layout
 
 ```
-src/index.ts           Routes + cron handler
-src/agent/tools.ts     ← add your tools here
-src/agent/runner.ts    Tool loop (usually no edits needed)
-src/types.ts           Default agent config
-public/index.html      Dashboard
-wrangler.toml          Cron schedule, KV binding
+Trigger     →  src/index.ts           routes, cron, webhooks
+Harness     →  src/agent/loop.ts      ReAct loop
+               src/agent/store.ts     config + run history
+LLM         →  src/subconscious/      Subconscious client
+Tools       →  src/agent/tools.ts     ← add your tools here
+examples/shopping-assistant/         Track 1 example
+public/index.html                    Dashboard
 ```
 
 ---
@@ -225,7 +281,7 @@ Already bundled at `.agents/skills/subconscious-dev/`. See [AGENTS.md](./AGENTS.
 | Base URL | `https://api.subconscious.dev/v1` |
 | Model | `subconscious/tim-qwen3.6-27b` |
 | Auth | `SUBCONSCIOUS_API_KEY` in `.dev.vars` |
-| Tools | OpenAI-style function calling — **your Worker runs them** |
+| Tools | Client-side ReAct loop — **your Worker runs them** (see [hack-cli-starter](https://github.com/subconscious-systems/subconscious/tree/main/examples/hack-cli-starter)) |
 
 Docs: [docs.subconscious.dev](https://docs.subconscious.dev) · Playground: [subconscious.dev/playground](https://www.subconscious.dev/playground)
 
@@ -233,6 +289,8 @@ Docs: [docs.subconscious.dev](https://docs.subconscious.dev) · Playground: [sub
 
 ## Tips
 
+- Try the [shopping assistant example](./examples/shopping-assistant/README.md) before building from scratch.
+- Prototype prompts in [hack-cli-starter](https://github.com/subconscious-systems/subconscious/tree/main/examples/hack-cli-starter), then deploy here.
 - Start with one track, one trigger, and one tool — then expand.
 - Use the dashboard to iterate on prompts before writing code.
 - Set `enableThinking: false` (default) for fast responses; turn on for harder reasoning tasks.
